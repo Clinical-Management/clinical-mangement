@@ -13,6 +13,8 @@ import {
 import { StatusBadge, VisitTypeBadge } from '../../components/appointments/Badges'
 import { NEXT_ACTIONS, PAYMENT_STATUSES, SOURCES, STATUS_META, VISIT_TYPES } from '../../components/appointments/options'
 import SlotPicker from '../../components/appointments/SlotPicker'
+import ClinicalNotesPanel from '../../components/clinical/ClinicalNotesPanel'
+import VitalsPanel from '../../components/clinical/VitalsPanel'
 import StartHistoryPanel from '../../components/history/StartHistoryPanel'
 import { labelOf } from '../../components/patients/options'
 import {
@@ -257,7 +259,7 @@ export default function AppointmentDetailPage() {
             )}
             {isFrontDesk && (
               <select
-                className={`${inputClass} w-auto`}
+                className={`${inputClass} w-auto!`}
                 value={appt.payment_status}
                 onChange={(e) => run(() => updatePayment(appt.id, e.target.value))}
                 title="Payment status"
@@ -297,7 +299,11 @@ export default function AppointmentDetailPage() {
         </section>
       )}
 
+      {!isOwner && <VitalsPanel appt={appt} canRecord={!['cancelled', 'no_show'].includes(appt.status)} />}
+
       <StartHistoryPanel appt={appt} />
+
+      {(isDoctor || user.role === ROLES.ADMIN) && <ClinicalNotesPanel appt={appt} />}
 
       <section className={cardClass}>
         <h2 className="mb-3 text-sm font-semibold text-slate-800">History</h2>

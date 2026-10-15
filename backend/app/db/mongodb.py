@@ -48,6 +48,10 @@ async def ensure_indexes() -> None:
     await mongo.db.history_sessions.create_index([("patient_id", ASCENDING), ("submitted_at", DESCENDING)])
     await mongo.db.alerts.create_index([("created_at", DESCENDING)])
 
+    await mongo.db.vitals.create_index([("patient_id", ASCENDING), ("recorded_at", ASCENDING)])
+    await mongo.db.vitals.create_index([("appointment_id", ASCENDING)])
+    await mongo.db.clinical_notes.create_index([("appointment_id", ASCENDING)], unique=True)
+
 
 def get_db() -> AsyncDatabase:
     return mongo.db

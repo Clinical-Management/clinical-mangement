@@ -62,7 +62,7 @@ export default function AppointmentListPage() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <select className={`${inputClass} w-auto`} value={range} onChange={(e) => setRange(e.target.value)}>
+        <select className={`${inputClass} w-auto!`} value={range} onChange={(e) => setRange(e.target.value)}>
           {RANGES.map((r) => (
             <option key={r.value} value={r.value}>
               {r.label}
@@ -70,12 +70,12 @@ export default function AppointmentListPage() {
           ))}
         </select>
         {range === 'day' && (
-          <input type="date" className={`${inputClass} w-auto`} value={date} onChange={(e) => setDate(e.target.value)} />
+          <input type="date" className={`${inputClass} w-auto!`} value={date} onChange={(e) => setDate(e.target.value)} />
         )}
         {isFrontDesk && (
-          <DoctorSelect value={doctorId} onChange={setDoctorId} allowAll className={`${inputClass} w-56`} />
+          <DoctorSelect value={doctorId} onChange={setDoctorId} allowAll className={`${inputClass} w-56!`} />
         )}
-        <select className={`${inputClass} w-auto`} value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select className={`${inputClass} w-auto!`} value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">Any status</option>
           {STATUSES.map((s) => (
             <option key={s.value} value={s.value}>

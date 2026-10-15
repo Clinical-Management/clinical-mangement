@@ -119,7 +119,7 @@ export default function QueuePage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {!isDoctor && <DoctorSelect value={doctorId} onChange={setDoctorId} allowAll className={`${inputClass} w-56`} />}
+          {!isDoctor && <DoctorSelect value={doctorId} onChange={setDoctorId} allowAll className={`${inputClass} w-56!`} />}
           {isFrontDesk && (
             <Link to={`${base}/new?mode=walk-in`} className={primaryButton}>
               Add walk-in

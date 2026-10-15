@@ -45,7 +45,7 @@ export default function HolidaysPage() {
           type="date"
           required
           min={todayISO()}
-          className={`${inputClass} w-auto`}
+          className={`${inputClass} w-auto!`}
           value={form.date}
           onChange={(e) => setForm({ ...form, date: e.target.value })}
         />

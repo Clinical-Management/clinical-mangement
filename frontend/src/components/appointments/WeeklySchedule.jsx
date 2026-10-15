@@ -21,14 +21,14 @@ export default function WeeklySchedule({ blocks, onChange, readOnly }) {
               <span key={b.i} className="flex items-center gap-1">
                 <input
                   type="time"
-                  className={`${inputClass} w-28 py-1`}
+                  className={`${inputClass} w-28! py-1`}
                   value={b.start}
                   onChange={(e) => update(b.i, 'start', e.target.value)}
                 />
                 -
                 <input
                   type="time"
-                  className={`${inputClass} w-28 py-1`}
+                  className={`${inputClass} w-28! py-1`}
                   value={b.end}
                   onChange={(e) => update(b.i, 'end', e.target.value)}
                 />

@@ -5,6 +5,7 @@ import ConsentPanel from '../../components/patients/ConsentPanel'
 import MedicalInfoPanel from '../../components/patients/MedicalInfoPanel'
 import { BLOOD_GROUPS, GENDERS, labelOf, RELATIONSHIPS } from '../../components/patients/options'
 import PatientQRCard from '../../components/patients/PatientQRCard'
+import VitalsTrends from '../../components/clinical/VitalsTrends'
 import { cardClass, errorMessage, formatDate, primaryButton, secondaryButton } from '../../components/ui'
 import { useAuth } from '../../context/AuthContext'
 import { APPOINTMENT_BASE, FRONT_DESK, PATIENT_BASE, ROLES } from '../../routes/roles'
@@ -138,6 +139,9 @@ export default function PatientDetailPage() {
           </section>
         </div>
       </div>
+
+      {/* receptionists record vitals at check-in but don't browse clinical history */}
+      {user.role !== ROLES.RECEPTIONIST && <VitalsTrends patientId={patient.patient_id} />}
     </div>
   )
 }

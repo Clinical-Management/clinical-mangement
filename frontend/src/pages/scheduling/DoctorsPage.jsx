@@ -65,7 +65,7 @@ export default function DoctorsPage() {
         {doctors.map((d) => {
           const days = [...new Set(d.weekly.map((b) => b.weekday))].sort().map((i) => WEEKDAYS[i])
           return (
-            <Link key={d.id} to={d.id} className={`${cardClass} transition hover:border-brand-500`}>
+            <Link key={d.id} to={d.id} className={`${cardClass} transition hover:border-accent-600`}>
               <p className="font-semibold text-slate-800">{d.full_name}</p>
               <p className="text-sm text-slate-500">{d.specialization || 'No specialization set'}</p>
               <p className={`mt-2 text-xs ${days.length ? 'text-slate-500' : 'text-amber-700'}`}>

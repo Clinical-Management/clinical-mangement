@@ -7,8 +7,8 @@ export function StatusBadge({ status }) {
 }
 
 const VISIT_STYLE = {
-  new: 'border-sky-200 bg-sky-50 text-sky-800',
-  follow_up: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  new: 'border-brand-200 bg-brand-50 text-brand-700',
+  follow_up: 'border-accent-100 bg-accent-50 text-accent-700',
   returning: 'border-slate-200 bg-slate-50 text-slate-700',
 }
 

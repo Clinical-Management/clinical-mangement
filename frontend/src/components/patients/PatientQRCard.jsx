@@ -17,7 +17,7 @@ export default function PatientQRCard({ patientId, size = 128, downloadable = tr
   return (
     <div className="flex flex-col items-center gap-2">
       <div ref={wrapper} className="rounded-lg border border-slate-200 bg-white p-2">
-        <QRCodeCanvas value={patientId} size={size} marginSize={1} />
+        <QRCodeCanvas value={patientId} size={size} marginSize={1} fgColor="#023b77" />
       </div>
       <span className="font-mono text-sm font-semibold text-slate-700">{patientId}</span>
       {downloadable && (

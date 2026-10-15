@@ -33,7 +33,7 @@ export default function ConsentPanel({ patient, onUpdated }) {
         <h2 className="text-sm font-semibold text-slate-800">Consent</h2>
         <span
           className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            patient.voicebot_allowed ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+            patient.voicebot_allowed ? 'bg-accent-50 text-accent-700' : 'bg-amber-50 text-amber-700'
           }`}
         >
           Voice assistant {patient.voicebot_allowed ? 'allowed' : 'not allowed'}

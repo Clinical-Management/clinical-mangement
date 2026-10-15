@@ -1,9 +1,36 @@
 @import "tailwindcss";
 
+/* Brand: deep navy #023b77 -> teal #039583 */
 @theme {
-  --color-brand-50: #eff8ff;
-  --color-brand-100: #dbeefe;
-  --color-brand-500: #2b7fd9;
-  --color-brand-600: #1f66b8;
-  --color-brand-700: #1a5194;
+  --color-brand-50: #eef4fb;
+  --color-brand-100: #d6e4f3;
+  --color-brand-200: #a9c5e5;
+  --color-brand-500: #1a5ea6;
+  --color-brand-600: #034a92;
+  --color-brand-700: #023b77;
+  --color-brand-800: #022f5f;
+  --color-brand-900: #01244a;
+
+  --color-accent-50: #e8f7f5;
+  --color-accent-100: #c4ebe5;
+  --color-accent-500: #04ad98;
+  --color-accent-600: #039583;
+  --color-accent-700: #027a6b;
+
+  --gradient-brand: linear-gradient(135deg, var(--color-brand-700), var(--color-accent-600));
+}
+
+@utility bg-brand-gradient {
+  background-image: var(--gradient-brand);
+}
+
+/* Same gradient running top -> bottom, for tall surfaces like the sidebar */
+@utility bg-brand-gradient-vertical {
+  background-image: linear-gradient(180deg, var(--color-brand-700), var(--color-accent-600));
+}
+
+@utility text-brand-gradient {
+  background-image: var(--gradient-brand);
+  background-clip: text;
+  color: transparent;
 }

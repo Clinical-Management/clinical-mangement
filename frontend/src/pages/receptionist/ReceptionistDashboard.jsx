@@ -19,7 +19,7 @@ export default function ReceptionistDashboard() {
       <h1 className="text-2xl font-semibold text-slate-800">Reception</h1>
       <div className="grid gap-4 sm:grid-cols-2">
         {ACTIONS.map((a) => (
-          <Link key={a.to} to={a.to} className={`${cardClass} transition hover:border-brand-500`}>
+          <Link key={a.to} to={a.to} className={`${cardClass} transition hover:border-accent-600`}>
             <h2 className="font-semibold text-brand-700">{a.title}</h2>
             <p className="mt-1 text-sm text-slate-500">{a.text}</p>
           </Link>

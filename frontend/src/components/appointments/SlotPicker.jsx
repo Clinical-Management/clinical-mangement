@@ -3,7 +3,7 @@ import { getSlots } from '../../api/doctors'
 import { errorMessage } from '../ui'
 
 const SLOT_STYLE = {
-  available: 'border-slate-300 bg-white text-slate-700 hover:border-brand-500',
+  available: 'border-slate-300 bg-white text-slate-700 hover:border-accent-600 hover:bg-accent-50',
   booked: 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 line-through',
   past: 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-300',
 }
@@ -50,7 +50,7 @@ export default function SlotPicker({ doctorId, date, value, onChange, keep }) {
               disabled={!selectable}
               onClick={() => onChange(s.start)}
               className={`rounded-md border px-2 py-1.5 text-sm ${
-                selected ? 'border-brand-600 bg-brand-600 text-white' : SLOT_STYLE[selectable ? 'available' : s.status]
+                selected ? 'border-transparent bg-brand-gradient text-white shadow-sm' : SLOT_STYLE[selectable ? 'available' : s.status]
               }`}
             >
               {s.start}

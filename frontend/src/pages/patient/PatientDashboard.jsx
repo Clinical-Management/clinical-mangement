@@ -39,12 +39,15 @@ export default function PatientDashboard() {
       </div>
 
       {!hasSelf && (
-        <div className="rounded-xl border border-brand-100 bg-brand-50 p-5">
-          <h2 className="font-semibold text-brand-700">Complete your patient profile</h2>
-          <p className="mt-1 text-sm text-slate-600">
+        <div className="rounded-xl bg-brand-gradient p-5 text-white shadow-sm">
+          <h2 className="font-semibold">Complete your patient profile</h2>
+          <p className="mt-1 text-sm text-white/85">
             We need a few details before you can book visits. You can add family members afterwards.
           </p>
-          <Link to={`${base}/new?relationship=self`} className={`${primaryButton} mt-3 inline-block`}>
+          <Link
+            to={`${base}/new?relationship=self`}
+            className="mt-3 inline-block rounded-md bg-white px-4 py-2 text-sm font-medium text-brand-700 hover:bg-brand-50"
+          >
             Complete profile
           </Link>
         </div>
@@ -55,7 +58,7 @@ export default function PatientDashboard() {
           <Link
             key={p.patient_id}
             to={`${base}/${p.patient_id}`}
-            className={`${cardClass} flex items-center gap-4 transition hover:border-brand-500`}
+            className={`${cardClass} flex items-center gap-4 transition hover:border-accent-600`}
           >
             <PatientQRCard patientId={p.patient_id} size={88} downloadable={false} />
             <div>

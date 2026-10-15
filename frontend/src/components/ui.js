@@ -1,17 +1,17 @@
 // Shared Tailwind class strings for form controls
 export const inputClass =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500'
+  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-accent-600 focus:outline-none focus:ring-1 focus:ring-accent-600'
 
 export const labelClass = 'mb-1 block text-xs font-medium text-slate-600'
 
 export const buttonClass =
-  'w-full rounded-md bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60'
+  'w-full rounded-md bg-brand-gradient px-3 py-2 text-sm font-medium text-white shadow-sm hover:brightness-110 disabled:opacity-60'
 
 export const primaryButton =
-  'rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60'
+  'rounded-md bg-brand-gradient px-4 py-2 text-sm font-medium text-white shadow-sm hover:brightness-110 disabled:opacity-60'
 
 export const secondaryButton =
-  'rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60'
+  'rounded-md border border-brand-200 bg-white px-4 py-2 text-sm font-medium text-brand-700 hover:bg-brand-50 disabled:opacity-60'
 
 export const cardClass = 'rounded-xl border border-slate-200 bg-white p-5'
 

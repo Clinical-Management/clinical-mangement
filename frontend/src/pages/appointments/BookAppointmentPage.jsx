@@ -14,7 +14,7 @@ function Step({ n, title, children }) {
   return (
     <section className={cardClass}>
       <h2 className="mb-3 text-sm font-semibold text-slate-800">
-        <span className="mr-2 inline-grid h-5 w-5 place-items-center rounded-full bg-brand-100 text-xs text-brand-700">
+        <span className="mr-2 inline-grid h-5 w-5 place-items-center rounded-full bg-brand-gradient text-xs text-white">
           {n}
         </span>
         {title}
@@ -111,7 +111,7 @@ export default function BookAppointmentPage() {
               key={m}
               type="button"
               onClick={() => setMode(m)}
-              className={`rounded px-3 py-1.5 ${mode === m ? 'bg-brand-600 text-white' : 'text-slate-600'}`}
+              className={`rounded px-3 py-1.5 ${mode === m ? 'bg-brand-gradient text-white' : 'text-slate-600'}`}
             >
               {label}
             </button>

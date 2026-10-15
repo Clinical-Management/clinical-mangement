@@ -69,7 +69,7 @@ export default function DoctorSchedulePage() {
     <div className="mx-auto max-w-4xl space-y-5">
       <h1 className="text-2xl font-semibold text-slate-800">{isAdmin ? doctor.full_name : 'My schedule'}</h1>
       {error && <p className={errorBox}>{error}</p>}
-      {message && <p className="rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</p>}
+      {message && <p className="rounded-md bg-accent-50 px-4 py-3 text-sm text-accent-700">{message}</p>}
 
       <form onSubmit={save} className={`${cardClass} space-y-5`}>
         <div className="grid gap-4 sm:grid-cols-3">

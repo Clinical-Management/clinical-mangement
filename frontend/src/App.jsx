@@ -15,10 +15,12 @@ import EditPatientPage from './pages/patients/EditPatientPage'
 import PatientDetailPage from './pages/patients/PatientDetailPage'
 import PatientListPage from './pages/patients/PatientListPage'
 import RegisterPatientPage from './pages/patients/RegisterPatientPage'
+import HistoryReviewPage from './pages/history/HistoryReviewPage'
 import ReceptionistDashboard from './pages/receptionist/ReceptionistDashboard'
 import DoctorSchedulePage from './pages/scheduling/DoctorSchedulePage'
 import DoctorsPage from './pages/scheduling/DoctorsPage'
 import HolidaysPage from './pages/scheduling/HolidaysPage'
+import VoicebotPage from './pages/voice/VoicebotPage'
 import ProtectedRoute from './routes/ProtectedRoute'
 import { ROLE_HOME, ROLES } from './routes/roles'
 
@@ -52,6 +54,8 @@ export default function App() {
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      {/* Voicebot: full screen, opened with a kiosk/phone link token or by a logged-in patient */}
+      <Route path="/voice/:sessionId" element={<VoicebotPage />} />
 
       <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
         <Route path="/admin" element={<DashboardLayout />}>
@@ -62,6 +66,7 @@ export default function App() {
           <Route path="doctors" element={<DoctorsPage />} />
           <Route path="doctors/:doctorId" element={<DoctorSchedulePage />} />
           <Route path="holidays" element={<HolidaysPage />} />
+          <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
       </Route>
 
@@ -72,6 +77,7 @@ export default function App() {
           {appointmentRoutes({ canBook: false })}
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<DoctorSchedulePage />} />
+          <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
       </Route>
 

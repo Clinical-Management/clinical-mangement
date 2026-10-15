@@ -119,6 +119,11 @@ class AppointmentOut(BaseModel):
     visit_type_override: VisitTypeOverrideOut | None
     payment_status: PaymentStatus
     cancel_reason: str | None = None
+    # Pre-visit history (voicebot); red_flag marks urgent symptoms raised there
+    history_session_id: PyObjectId | None = None
+    history_status: str | None = None
+    red_flag: bool = False
+    red_flag_labels: str | None = None
     status_history: list[StatusEvent]
     reschedule_history: list[RescheduleEvent]
     created_at: datetime

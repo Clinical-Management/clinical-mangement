@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.errors import DomainError
+from app.history.engine import EngineError
 from app.db.mongodb import close_mongo_connection, connect_to_mongo
 
 
@@ -31,6 +32,12 @@ app.add_middleware(
 @app.exception_handler(DomainError)
 async def domain_error_handler(_: Request, exc: DomainError):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+
+@app.exception_handler(EngineError)
+async def engine_error_handler(_: Request, exc: EngineError):
+    # The UI offers typed chat / manual entry by staff when the assistant is unavailable
+    return JSONResponse(status_code=503, content={"detail": {"code": "ai_unavailable", "message": str(exc)}})
 
 
 app.include_router(api_router, prefix=settings.api_prefix)

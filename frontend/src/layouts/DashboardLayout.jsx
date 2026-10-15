@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import AlertsBanner from '../components/history/AlertsBanner'
 import Logo from '../components/Logo'
 import { useAuth } from '../context/AuthContext'
-import { ROLE_NAV } from '../routes/roles'
+import { ROLE_NAV, ROLES } from '../routes/roles'
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -48,6 +49,7 @@ export default function DashboardLayout() {
             </button>
           </div>
         </header>
+        {user.role !== ROLES.PATIENT && <AlertsBanner />}
         <main className="flex-1 p-6">
           <Outlet />
         </main>

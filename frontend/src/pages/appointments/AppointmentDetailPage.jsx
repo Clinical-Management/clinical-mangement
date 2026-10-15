@@ -13,6 +13,7 @@ import {
 import { StatusBadge, VisitTypeBadge } from '../../components/appointments/Badges'
 import { NEXT_ACTIONS, PAYMENT_STATUSES, SOURCES, STATUS_META, VISIT_TYPES } from '../../components/appointments/options'
 import SlotPicker from '../../components/appointments/SlotPicker'
+import StartHistoryPanel from '../../components/history/StartHistoryPanel'
 import { labelOf } from '../../components/patients/options'
 import {
   cardClass,
@@ -185,6 +186,12 @@ export default function AppointmentDetailPage() {
 
       {error && <p className={errorBox}>{error}</p>}
 
+      {appt.red_flag && (
+        <p className="rounded-xl bg-red-600 px-4 py-3 text-sm font-medium text-white">
+          Red flag raised during pre-visit history: {appt.red_flag_labels}. See the patient urgently.
+        </p>
+      )}
+
       <section className={cardClass}>
         <dl className="grid gap-4 sm:grid-cols-3">
           <Detail label="Patient">
@@ -289,6 +296,8 @@ export default function AppointmentDetailPage() {
           )}
         </section>
       )}
+
+      <StartHistoryPanel appt={appt} />
 
       <section className={cardClass}>
         <h2 className="mb-3 text-sm font-semibold text-slate-800">History</h2>

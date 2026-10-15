@@ -13,7 +13,7 @@ const ACTIVE = ['in_consultation', 'with_voicebot', 'waiting']
 
 function QueueRow({ appt, base, onAction }) {
   return (
-    <tr className="border-b border-slate-100 last:border-0">
+    <tr className={`border-b border-slate-100 last:border-0 ${appt.red_flag ? 'bg-red-50' : ''}`}>
       <td className="px-4 py-3 text-lg font-semibold text-slate-800">#{appt.token}</td>
       <td className="px-4 py-3">
         <Link to={`${base}/${appt.id}`} className="font-medium text-slate-800 hover:underline">
@@ -21,7 +21,13 @@ function QueueRow({ appt, base, onAction }) {
         </Link>
         <span className="block text-xs text-slate-500">
           {appt.start_time ? `Slot ${appt.start_time}` : 'Walk-in'} | {appt.doctor_name}
+          {appt.history_status === 'submitted' && ' | history ready'}
         </span>
+        {appt.red_flag && (
+          <span className="mt-1 inline-block rounded bg-red-600 px-1.5 py-0.5 text-xs font-medium text-white">
+            Red flag: {appt.red_flag_labels}
+          </span>
+        )}
       </td>
       <td className="px-4 py-3">
         <VisitTypeBadge type={appt.visit_type} overridden={!!appt.visit_type_override} />

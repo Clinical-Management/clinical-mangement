@@ -21,6 +21,13 @@ class Settings(BaseSettings):
     clinic_timezone: str = "Asia/Kolkata"
     booking_horizon_days: int = 90
 
+    # Voicebot patient history (Claude). The key may also come from ANTHROPIC_API_KEY
+    # in the process environment or an `ant auth login` profile.
+    anthropic_api_key: str | None = None
+    history_model: str = "claude-opus-5-5"
+    history_effort: str = "low"  # per-turn latency matters for a spoken conversation
+    history_link_minutes: int = 120  # lifetime of kiosk / phone links
+
     # Comma-separated in the env var, e.g. "http://localhost:5173,https://app.vercel.app"
     cors_origins: str = "http://localhost:5173"
 

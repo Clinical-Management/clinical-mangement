@@ -17,6 +17,9 @@ export const APPOINTMENT_BASE = {
   patient: '/patient/appointments',
 }
 
+// Pre-visit history (voicebot) review: clinical roles only
+export const HISTORY_BASE = { admin: '/admin/history', doctor: '/doctor/history' }
+
 // Front-desk roles: register walk-ins, check patients in, review possible duplicates
 export const FRONT_DESK = [ROLES.ADMIN, ROLES.RECEPTIONIST]
 

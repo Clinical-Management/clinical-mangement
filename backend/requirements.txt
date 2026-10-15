@@ -7,6 +7,10 @@ pyjwt==2.10.1
 bcrypt==4.3.0
 tzdata==2025.2  # zoneinfo data on Windows / slim images
 anthropic==1.14.0  # voicebot history interviewer
+python-multipart==0.0.32  # file uploads
+pypdf==6.20.1
+pillow==12.3.0
+pydicom==3.0.2
 
 # ML inference (keep lean: Render free tier has 512 MB RAM)
 numpy==2.2.5

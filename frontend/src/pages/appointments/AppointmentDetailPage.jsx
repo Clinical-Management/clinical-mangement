@@ -303,6 +303,24 @@ export default function AppointmentDetailPage() {
 
       <StartHistoryPanel appt={appt} />
 
+      <section className={`${cardClass} flex flex-wrap items-center justify-between gap-2`}>
+        <h2 className="text-sm font-semibold text-slate-800">Reports</h2>
+        <span className="flex gap-3 text-sm">
+          <Link
+            to={`${PATIENT_BASE[user.role]}/${appt.patient_id}/reports?appointment_id=${appt.id}`}
+            className="text-brand-600 hover:underline"
+          >
+            View patient's reports
+          </Link>
+          <Link
+            to={`${PATIENT_BASE[user.role]}/${appt.patient_id}/reports/upload?appointment_id=${appt.id}`}
+            className="text-brand-600 hover:underline"
+          >
+            Upload report for this visit
+          </Link>
+        </span>
+      </section>
+
       {(isDoctor || user.role === ROLES.ADMIN) && <ClinicalNotesPanel appt={appt} />}
 
       <section className={cardClass}>

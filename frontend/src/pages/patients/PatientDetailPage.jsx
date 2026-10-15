@@ -70,7 +70,10 @@ export default function PatientDetailPage() {
                 {patient.relationship && ` | ${labelOf(RELATIONSHIPS, patient.relationship)}`}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Link to={`${base}/${patient.patient_id}/reports`} className={secondaryButton}>
+                Reports
+              </Link>
               {canEditDetails && (
                 <Link to={`${base}/${patient.patient_id}/edit`} className={secondaryButton}>
                   Edit details

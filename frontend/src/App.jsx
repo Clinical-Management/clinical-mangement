@@ -17,6 +17,9 @@ import PatientListPage from './pages/patients/PatientListPage'
 import RegisterPatientPage from './pages/patients/RegisterPatientPage'
 import HistoryReviewPage from './pages/history/HistoryReviewPage'
 import ReceptionistDashboard from './pages/receptionist/ReceptionistDashboard'
+import ReportDetailPage from './pages/reports/ReportDetailPage'
+import ReportLibraryPage from './pages/reports/ReportLibraryPage'
+import UploadReportPage from './pages/reports/UploadReportPage'
 import DoctorSchedulePage from './pages/scheduling/DoctorSchedulePage'
 import DoctorsPage from './pages/scheduling/DoctorsPage'
 import HolidaysPage from './pages/scheduling/HolidaysPage'
@@ -37,6 +40,16 @@ function patientRoutes(path, { canRegister = true, canEdit = true } = {}) {
     canRegister && <Route key="new" path={`${path}/new`} element={<RegisterPatientPage />} />,
     <Route key="detail" path={`${path}/:patientId`} element={<PatientDetailPage />} />,
     canEdit && <Route key="edit" path={`${path}/:patientId/edit`} element={<EditPatientPage />} />,
+    ...reportRoutes(path),
+  ]
+}
+
+// A patient's report library (all roles; `path` is that role's patient base)
+function reportRoutes(path) {
+  return [
+    <Route key="reports" path={`${path}/:patientId/reports`} element={<ReportLibraryPage />} />,
+    <Route key="upload" path={`${path}/:patientId/reports/upload`} element={<UploadReportPage />} />,
+    <Route key="report" path={`${path}/:patientId/reports/:reportId`} element={<ReportDetailPage />} />,
   ]
 }
 
@@ -96,6 +109,7 @@ export default function App() {
           <Route path="profiles/new" element={<RegisterPatientPage />} />
           <Route path="profiles/:patientId" element={<PatientDetailPage />} />
           <Route path="profiles/:patientId/edit" element={<EditPatientPage />} />
+          {reportRoutes('profiles')}
           {appointmentRoutes()}
         </Route>
       </Route>

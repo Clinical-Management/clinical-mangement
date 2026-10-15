@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     history_effort: str = "low"  # per-turn latency matters for a spoken conversation
     history_link_minutes: int = 120  # lifetime of kiosk / phone links
 
+    # Report uploads (stored in MongoDB GridFS)
+    report_max_mb: int = 25
+
     # Comma-separated in the env var, e.g. "http://localhost:5173,https://app.vercel.app"
     cors_origins: str = "http://localhost:5173"
 

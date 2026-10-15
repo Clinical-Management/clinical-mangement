@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listPatients } from '../../api/patients'
 import { labelOf, RELATIONSHIPS } from '../../components/patients/options'
+import UpcomingVisits from '../../components/dashboard/UpcomingVisits'
 import PatientQRCard from '../../components/patients/PatientQRCard'
 import { cardClass, errorMessage, primaryButton } from '../../components/ui'
 import { PATIENT_BASE } from '../../routes/roles'
@@ -52,6 +53,8 @@ export default function PatientDashboard() {
           </Link>
         </div>
       )}
+
+      {hasSelf && <UpcomingVisits />}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {profiles.map((p) => (

@@ -89,7 +89,7 @@ export default function PatientListPage() {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <div className={`${cardClass} overflow-x-auto p-0`}>
+      <div className={`${cardClass} overflow-x-auto p-0!`}>
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
             <tr>

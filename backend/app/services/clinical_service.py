@@ -57,6 +57,11 @@ async def record_vitals(db: AsyncDatabase, appt: dict, data: VitalsIn, actor: di
     await db.vitals.insert_one(doc)
 
     critical = {k: f for k, f in doc["flags"].items() if f.startswith("critical")}
+    # Summary on the appointment so queues and dashboards can highlight it
+    await db.appointments.update_one(
+        {"_id": appt["_id"]},
+        {"$set": {"vitals_flag": "critical" if critical else "abnormal" if doc["flags"] else "normal"}},
+    )
     if critical:
         readings = ", ".join(f"{vt.LABELS[k]} {values[k]:g} {vt.UNITS[k]}" for k in critical)
         await db.alerts.insert_one(

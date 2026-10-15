@@ -124,6 +124,7 @@ class AppointmentOut(BaseModel):
     history_status: str | None = None
     red_flag: bool = False
     red_flag_labels: str | None = None
+    vitals_flag: str | None = None  # latest vitals: normal | abnormal | critical
     status_history: list[StatusEvent]
     reschedule_history: list[RescheduleEvent]
     created_at: datetime

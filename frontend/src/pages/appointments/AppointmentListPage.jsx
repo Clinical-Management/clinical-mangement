@@ -87,7 +87,7 @@ export default function AppointmentListPage() {
 
       {error && <p className={errorBox}>{error}</p>}
 
-      <div className={`${cardClass} overflow-x-auto p-0`}>
+      <div className={`${cardClass} overflow-x-auto p-0!`}>
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
             <tr>

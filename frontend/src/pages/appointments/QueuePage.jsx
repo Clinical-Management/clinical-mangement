@@ -132,14 +132,14 @@ export default function QueuePage() {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {Object.entries(counts).map(([status, n]) => (
-          <div key={status} className={`${cardClass} p-4`}>
+          <div key={status} className={`${cardClass} p-4!`}>
             <p className="text-2xl font-semibold text-slate-800">{n}</p>
             <p className="text-xs text-slate-500">{STATUS_META[status].label}</p>
           </div>
         ))}
       </div>
 
-      <section className={`${cardClass} overflow-x-auto p-0`}>
+      <section className={`${cardClass} overflow-x-auto p-0!`}>
         <table className="w-full text-left text-sm">
           <tbody>
             {active.map((a) => (

@@ -49,6 +49,7 @@ def test_record_vitals_flags_and_alerts(client, clinic):
 
     alerts = client.get("/api/v1/alerts", headers=clinic["doctor"]).json()
     assert len(alerts) == 1 and "SpO2 88" in alerts[0]["message"]
+    assert client.get(f"{APPT_API}/{appt}", headers=clinic["doctor"]).json()["vitals_flag"] == "critical"
 
 
 def test_vitals_validation(client, clinic):

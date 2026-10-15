@@ -1,8 +1,13 @@
+import FrontDeskDashboard from '../../components/dashboard/FrontDeskDashboard'
+
 export default function AdminDashboard() {
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-slate-800">Admin Dashboard</h1>
-      <p className="mt-2 text-slate-500">Features for this portal will appear here.</p>
-    </div>
+    <FrontDeskDashboard
+      title="Clinic overview"
+      extraActions={[
+        { to: '/admin/doctors', label: 'Doctors' },
+        { to: '/admin/holidays', label: 'Holidays' },
+      ]}
+    />
   )
 }

@@ -1,0 +1,49 @@
+from pymongo import ASCENDING, DESCENDING, AsyncMongoClient
+from pymongo.asynchronous.database import AsyncDatabase
+
+from app.core.config import settings
+
+
+class Mongo:
+    client: AsyncMongoClient | None = None
+    db: AsyncDatabase | None = None
+
+
+mongo = Mongo()
+
+
+async def connect_to_mongo() -> None:
+    mongo.client = AsyncMongoClient(settings.mongodb_uri, tz_aware=True)
+    mongo.db = mongo.client[settings.mongodb_db]
+    await ensure_indexes()
+
+
+async def close_mongo_connection() -> None:
+    if mongo.client is not None:
+        await mongo.client.close()
+
+
+async def ensure_indexes() -> None:
+    await mongo.db.users.create_index([("email", ASCENDING)], unique=True)
+
+    patients = mongo.db.patients
+    await patients.create_index([("patient_id", ASCENDING)], unique=True)
+    await patients.create_index([("phone_key", ASCENDING), ("name_key", ASCENDING)])
+    await patients.create_index([("managed_by", ASCENDING)])
+    await patients.create_index([("created_at", DESCENDING)])
+
+    appointments = mongo.db.appointments
+    # slot_key is only present while an appointment holds a slot; unsetting it releases the slot
+    await appointments.create_index(
+        [("slot_key", ASCENDING)], unique=True, partialFilterExpression={"slot_key": {"$type": "string"}}
+    )
+    await appointments.create_index([("doctor_id", ASCENDING), ("date", ASCENDING), ("token", ASCENDING)])
+    await appointments.create_index([("patient_id", ASCENDING), ("doctor_id", ASCENDING), ("date", DESCENDING)])
+    await appointments.create_index([("date", ASCENDING), ("start_time", ASCENDING)])
+
+    await mongo.db.doctor_leaves.create_index([("doctor_id", ASCENDING), ("start_date", ASCENDING)])
+    await mongo.db.holidays.create_index([("date", ASCENDING)], unique=True)
+
+
+def get_db() -> AsyncDatabase:
+    return mongo.db

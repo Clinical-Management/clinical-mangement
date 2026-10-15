@@ -1,0 +1,12 @@
+# Training-only dependencies (NOT installed on Render)
+numpy
+pandas
+scikit-learn==1.6.1  # must match backend/requirements.txt so pickled models load
+joblib
+matplotlib
+jupyter
+
+# Deep learning: pick one framework, export to ONNX for serving
+# torch
+# tensorflow
+# onnx

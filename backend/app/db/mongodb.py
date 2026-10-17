@@ -54,6 +54,8 @@ async def ensure_indexes() -> None:
 
     await mongo.db.reports.create_index([("patient_id", ASCENDING), ("report_date", DESCENDING)])
     await mongo.db.reports.create_index([("patient_id", ASCENDING), ("versions.sha256", ASCENDING)])
+    await mongo.db.report_summaries.create_index([("report_id", ASCENDING), ("report_version", ASCENDING)], unique=True)
+    await mongo.db.report_summaries.create_index([("patient_id", ASCENDING), ("status", ASCENDING)])
 
 
 def get_db() -> AsyncDatabase:

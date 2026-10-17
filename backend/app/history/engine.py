@@ -9,16 +9,14 @@ import json
 from functools import lru_cache
 from typing import Any, Literal, Protocol
 
-import anthropic
 from pydantic import BaseModel, ValidationError
 
+from app.ai.client import EngineError, claude
 from app.core.config import settings
 from app.history.fields import FIELD_DEFS, FIELD_KEYS, LANGUAGES, TEMPLATES
 from app.history.safety import RED_FLAG_CODES, RED_FLAGS
 
-
-class EngineError(Exception):
-    """The AI interviewer could not produce a usable answer (not configured, outage, refusal...)."""
+__all__ = ["EngineError", "ClaudeEngine", "get_engine"]
 
 
 # --- output contracts --------------------------------------------------------
@@ -187,47 +185,12 @@ class HistoryEngine(Protocol):
 
 class ClaudeEngine:
     def __init__(self) -> None:
-        try:
-            self.client = (
-                anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-                if settings.anthropic_api_key
-                else anthropic.AsyncAnthropic()
-            )
-        except Exception as exc:  # no credentials resolvable
-            raise EngineError("The AI assistant is not configured") from exc
+        self.client = claude()
 
     async def _call(self, system: str, user: str, schema: dict | None) -> str:
-        output_config: dict[str, Any] = {"effort": settings.history_effort}
-        if schema:
-            output_config["format"] = {"type": "json_schema", "schema": schema}
-        try:
-            response = await self.client.beta.messages.create(
-                model=settings.history_model,
-                max_tokens=16000,
-                # On a safety-classifier decline, retry server-side on Anthropic's recommended fallback model
-                betas=["server-side-fallback-2026-07-01"],
-                fallbacks="default",
-                system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
-                output_config=output_config,
-                messages=[{"role": "user", "content": user}],
-            )
-        except anthropic.AuthenticationError as exc:
-            raise EngineError("The AI assistant is not configured correctly") from exc
-        except anthropic.RateLimitError as exc:
-            raise EngineError("The AI assistant is busy, please try again in a moment") from exc
-        except anthropic.APIStatusError as exc:
-            raise EngineError(f"The AI assistant failed ({exc.status_code})") from exc
-        except anthropic.APIConnectionError as exc:
-            raise EngineError("Could not reach the AI assistant") from exc
-        except TypeError as exc:  # SDK raises this when no credentials can be resolved
-            raise EngineError("The AI assistant is not configured") from exc
-
-        if response.stop_reason in ("refusal", "max_tokens"):
-            raise EngineError(f"The AI assistant could not answer ({response.stop_reason})")
-        text = next((b.text for b in response.content if b.type == "text"), None)
-        if text is None:
-            raise EngineError("The AI assistant returned no answer")
-        return text
+        return await self.client.call(
+            model=settings.history_model, effort=settings.history_effort, system=system, content=user, schema=schema
+        )
 
     async def next_turn(self, ctx: dict[str, Any]) -> TurnResult:
         raw = await self._call(SYSTEM_PROMPT, _render_context(ctx) + "\n\nWrite your next turn.", TURN_SCHEMA)

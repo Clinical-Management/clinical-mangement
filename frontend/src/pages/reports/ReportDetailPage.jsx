@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { exportReport, fetchReportFile, getReport, replaceReportFile, updateReport } from '../../api/reports'
 import { ACCEPT, formatSize, KIND_LABEL, REPORT_TYPES, saveOrShare, typeLabel } from '../../components/reports/reportMeta'
+import SummaryCard from '../../components/reports/SummaryCard'
 import { cardClass, errorBox, errorMessage, formatDate, formatTime, inputClass, labelClass, primaryButton, secondaryButton } from '../../components/ui'
 import { useAuth } from '../../context/AuthContext'
 import { PATIENT_BASE, ROLES } from '../../routes/roles'
@@ -135,6 +136,8 @@ export default function ReportDetailPage() {
         </section>
 
         <div className="space-y-5">
+          {canViewFiles && <SummaryCard reportId={report.id} reviewPath={`${libraryPath}/${report.id}/summary`} />}
+
           <section className={cardClass}>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-slate-800">Details</h2>

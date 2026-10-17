@@ -1,8 +1,9 @@
 from datetime import date
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, File, Form, Query, Response, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Query, Response, UploadFile
 
+from app.api.v1.routes.summaries import EngineFactory, schedule
 from app.core.deps import DB, CurrentUser, require_roles
 from app.schemas.report import ExportIn, FileCheckOut, ReportOut, ReportType, ReportUpdate
 from app.schemas.user import Role
@@ -30,6 +31,8 @@ async def upload_report(
     patient_id: str,
     db: DB,
     user: CurrentUser,
+    background: BackgroundTasks,
+    engine: EngineFactory,
     file: UploadFile = File(..., description="The original file, stored unchanged"),
     processed: UploadFile | None = File(None, description="Enhanced copy of a camera capture (JPG/PNG)"),
     report_type: ReportType = Form(...),
@@ -40,7 +43,7 @@ async def upload_report(
     notes: str | None = Form(None, max_length=1000),
     source: Literal["upload", "camera"] = Form("upload"),
 ):
-    return await svc.create_report(
+    report = await svc.create_report(
         db,
         patient_id=patient_id,
         data=await file.read(),
@@ -55,6 +58,8 @@ async def upload_report(
         notes=notes,
         user=user,
     )
+    await schedule(db, report, background, engine)  # AI summary in the background (if consented)
+    return report
 
 
 @router.get("/patients/{patient_id}/reports", response_model=list[ReportOut], dependencies=[Uploaders])
@@ -99,6 +104,8 @@ async def replace_file(
     report_id: str,
     db: DB,
     user: CurrentUser,
+    background: BackgroundTasks,
+    engine: EngineFactory,
     file: UploadFile = File(...),
     processed: UploadFile | None = File(None),
     reason: str = Form(..., min_length=1, max_length=300),
@@ -106,10 +113,12 @@ async def replace_file(
 ):
     """Upload a replacement file. Earlier versions are kept."""
     report = await svc.get_report(db, report_id, user)
-    return await svc.add_version(
+    report = await svc.add_version(
         db, report, data=await file.read(), filename=file.filename or "report",
         processed=await processed.read() if processed else None, source=source, reason=reason, user=user,
     )
+    await schedule(db, report, background, engine)  # new file, new summary
+    return report
 
 
 @router.get("/reports/{report_id}/file", dependencies=[Uploaders])

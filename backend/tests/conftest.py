@@ -58,3 +58,20 @@ def make_user(client):
         return {"Authorization": f"Bearer {create_access_token(str(uid), role)}"}
 
     return _make
+
+
+@pytest.fixture(autouse=True)
+def no_real_report_ai():
+    """Report uploads trigger AI summaries in the background; never call the real API in tests.
+    Tests that need summaries install their own fake engine over this one."""
+    from app.ai.client import EngineError
+    from app.api.v1.routes.summaries import get_summary_engine_factory
+    from app.main import app
+
+    class Disabled:
+        async def extract(self, pages, context):
+            raise EngineError("AI disabled in tests")
+
+    app.dependency_overrides[get_summary_engine_factory] = lambda: (lambda: Disabled())
+    yield
+    app.dependency_overrides.pop(get_summary_engine_factory, None)

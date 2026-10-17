@@ -1,31 +1,35 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import DashboardLayout from './layouts/DashboardLayout'
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AppointmentDetailPage from './pages/appointments/AppointmentDetailPage'
-import AppointmentListPage from './pages/appointments/AppointmentListPage'
-import BookAppointmentPage from './pages/appointments/BookAppointmentPage'
-import QueuePage from './pages/appointments/QueuePage'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
-import DoctorDashboard from './pages/doctor/DoctorDashboard'
 import NotFound from './pages/NotFound'
-import PatientDashboard from './pages/patient/PatientDashboard'
-import EditPatientPage from './pages/patients/EditPatientPage'
-import PatientDetailPage from './pages/patients/PatientDetailPage'
-import PatientListPage from './pages/patients/PatientListPage'
-import RegisterPatientPage from './pages/patients/RegisterPatientPage'
-import HistoryReviewPage from './pages/history/HistoryReviewPage'
-import ReceptionistDashboard from './pages/receptionist/ReceptionistDashboard'
-import ReportDetailPage from './pages/reports/ReportDetailPage'
-import ReportLibraryPage from './pages/reports/ReportLibraryPage'
-import UploadReportPage from './pages/reports/UploadReportPage'
-import DoctorSchedulePage from './pages/scheduling/DoctorSchedulePage'
-import DoctorsPage from './pages/scheduling/DoctorsPage'
-import HolidaysPage from './pages/scheduling/HolidaysPage'
-import VoicebotPage from './pages/voice/VoicebotPage'
 import ProtectedRoute from './routes/ProtectedRoute'
 import { ROLE_HOME, ROLES } from './routes/roles'
+
+// Pages load on demand so each role downloads only what it uses
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AppointmentDetailPage = lazy(() => import('./pages/appointments/AppointmentDetailPage'))
+const AppointmentListPage = lazy(() => import('./pages/appointments/AppointmentListPage'))
+const BookAppointmentPage = lazy(() => import('./pages/appointments/BookAppointmentPage'))
+const QueuePage = lazy(() => import('./pages/appointments/QueuePage'))
+const DoctorDashboard = lazy(() => import('./pages/doctor/DoctorDashboard'))
+const PatientDashboard = lazy(() => import('./pages/patient/PatientDashboard'))
+const EditPatientPage = lazy(() => import('./pages/patients/EditPatientPage'))
+const PatientDetailPage = lazy(() => import('./pages/patients/PatientDetailPage'))
+const PatientListPage = lazy(() => import('./pages/patients/PatientListPage'))
+const RegisterPatientPage = lazy(() => import('./pages/patients/RegisterPatientPage'))
+const HistoryReviewPage = lazy(() => import('./pages/history/HistoryReviewPage'))
+const ReceptionistDashboard = lazy(() => import('./pages/receptionist/ReceptionistDashboard'))
+const ReportDetailPage = lazy(() => import('./pages/reports/ReportDetailPage'))
+const ReportLibraryPage = lazy(() => import('./pages/reports/ReportLibraryPage'))
+const ReportSummaryPage = lazy(() => import('./pages/reports/ReportSummaryPage'))
+const UploadReportPage = lazy(() => import('./pages/reports/UploadReportPage'))
+const DoctorSchedulePage = lazy(() => import('./pages/scheduling/DoctorSchedulePage'))
+const DoctorsPage = lazy(() => import('./pages/scheduling/DoctorsPage'))
+const HolidaysPage = lazy(() => import('./pages/scheduling/HolidaysPage'))
+const VoicebotPage = lazy(() => import('./pages/voice/VoicebotPage'))
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -50,6 +54,7 @@ function reportRoutes(path) {
     <Route key="reports" path={`${path}/:patientId/reports`} element={<ReportLibraryPage />} />,
     <Route key="upload" path={`${path}/:patientId/reports/upload`} element={<UploadReportPage />} />,
     <Route key="report" path={`${path}/:patientId/reports/:reportId`} element={<ReportDetailPage />} />,
+    <Route key="summary" path={`${path}/:patientId/reports/:reportId/summary`} element={<ReportSummaryPage />} />,
   ]
 }
 
@@ -63,6 +68,7 @@ function appointmentRoutes({ canBook = true } = {}) {
 
 export default function App() {
   return (
+    <Suspense fallback={<div className="grid h-screen place-items-center text-slate-500">Loading...</div>}>
     <Routes>
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<Login />} />
@@ -116,5 +122,6 @@ export default function App() {
 
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </Suspense>
   )
 }

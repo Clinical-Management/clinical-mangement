@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     history_effort: str = "low"  # per-turn latency matters for a spoken conversation
     history_link_minutes: int = 120  # lifetime of kiosk / phone links
 
+    # Report summarization (Claude reads the report pages)
+    report_model: str = "claude-opus-5-5"
+    report_effort: str = "high"  # accuracy over speed: values feed clinical decisions
+
     # Report uploads (stored in MongoDB GridFS)
     report_max_mb: int = 25
 

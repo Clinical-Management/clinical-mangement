@@ -5,16 +5,13 @@ Originals are never modified: content pages are copied from the stored file
 """
 
 import io
-import logging
 from datetime import datetime
 
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from pypdf import PdfReader, PdfWriter
 
 from app.reports.files import load_image
-
-log = logging.getLogger(__name__)
+from app.reports.pages import dicom_to_image
 
 A4 = (1240, 1754)  # A4 at 150 dpi
 NAVY = (2, 59, 119)
@@ -70,25 +67,16 @@ def image_pages(data: bytes) -> bytes:
 
 def dicom_pages(data: bytes) -> bytes:
     """Render the DICOM pixel data when it is uncompressed or uses a codec pydicom handles natively."""
-    import pydicom
-
-    try:
-        ds = pydicom.dcmread(io.BytesIO(data))
-        pixels = ds.pixel_array.astype(np.float32)
-        if pixels.ndim == 3 and pixels.shape[-1] not in (3, 4):
-            pixels = pixels[pixels.shape[0] // 2]  # multi-frame: middle slice
-        lo, hi = np.percentile(pixels, (0.5, 99.5))
-        pixels = np.clip((pixels - lo) / max(hi - lo, 1) * 255, 0, 255).astype(np.uint8)
-        if str(ds.get("PhotometricInterpretation", "")) == "MONOCHROME1":
-            pixels = 255 - pixels
-        buf = io.BytesIO()
-        Image.fromarray(pixels).save(buf, "PNG")
-        return image_pages(buf.getvalue())
-    except Exception:
-        log.info("DICOM image could not be rendered for export", exc_info=True)
+    img = dicom_to_image(data)
+    if img is None:
         return message_page(
-            "This DICOM image could not be rendered into the PDF.\nPlease download the original .dcm file\nand open it in a DICOM viewer."
+            "This DICOM image could not be rendered into the PDF.\n"
+            "Please download the original .dcm file\n"
+            "and open it in a DICOM viewer."
         )
+    buf = io.BytesIO()
+    img.save(buf, "PNG")
+    return image_pages(buf.getvalue())
 
 
 def build_pdf(parts: list[dict]) -> bytes:

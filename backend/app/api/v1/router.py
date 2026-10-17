@@ -14,6 +14,7 @@ from app.api.v1.routes import (
     patients,
     receptionist,
     reports,
+    summaries,
 )
 
 api_router = APIRouter()
@@ -29,4 +30,5 @@ api_router.include_router(appointments.router)
 api_router.include_router(history.router)
 api_router.include_router(clinical.router)
 api_router.include_router(reports.router)
+api_router.include_router(summaries.router)
 api_router.include_router(ml.router)

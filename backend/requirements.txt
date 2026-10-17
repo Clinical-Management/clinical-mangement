@@ -11,6 +11,7 @@ python-multipart==0.0.32  # file uploads
 pypdf==6.20.1
 pillow==12.3.0
 pydicom==3.0.2
+pypdfium2==5.14.0  # render report pages for AI reading and the viewer
 
 # ML inference (keep lean: Render free tier has 512 MB RAM)
 numpy==2.2.5

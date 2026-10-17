@@ -31,3 +31,28 @@ export const exportReport = (id) => api.get(`/reports/${id}/export`, { responseT
 
 export const exportReports = (patientId, reportIds) =>
   api.post(`/patients/${patientId}/reports/export`, { report_ids: reportIds }, { responseType: 'blob' }).then((r) => r.data)
+
+// AI summaries
+export const getReportSummary = (id) => api.get(`/reports/${id}/summary`).then((r) => r.data)
+
+export const runReportSummary = (id) => api.post(`/reports/${id}/summary`).then((r) => r.data)
+
+export const getPageCount = (id, version) => api.get(`/reports/${id}/pages`, { params: { version } }).then((r) => r.data.count)
+
+export const fetchPageImage = (id, page, version) =>
+  api.get(`/reports/${id}/pages/${page}`, { params: { version }, responseType: 'blob' }).then((r) => r.data)
+
+export const editSummaryTest = (summaryId, testId, changes) =>
+  api.patch(`/report-summaries/${summaryId}/tests/${testId}`, changes).then((r) => r.data)
+
+export const addSummaryTest = (summaryId, row) => api.post(`/report-summaries/${summaryId}/tests`, row).then((r) => r.data)
+
+export const removeSummaryTest = (summaryId, testId) =>
+  api.delete(`/report-summaries/${summaryId}/tests/${testId}`).then((r) => r.data)
+
+export const editSummaryText = (summaryId, changes) =>
+  api.patch(`/report-summaries/${summaryId}/text`, changes).then((r) => r.data)
+
+export const approveSummary = (summaryId) => api.post(`/report-summaries/${summaryId}/approve`).then((r) => r.data)
+
+export const getSummaryTrends = (summaryId) => api.get(`/report-summaries/${summaryId}/trends`).then((r) => r.data)

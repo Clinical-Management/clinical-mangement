@@ -137,11 +137,15 @@ function ManualEntry({ session, onSaved }) {
 
 export default function HistoryReviewPage() {
   const { sessionId } = useParams()
+  return <HistoryWorkspace sessionId={sessionId} />
+}
+
+/** A voicebot history: summary, editable structured fields, collapsible transcript and log. */
+export function HistoryWorkspace({ sessionId, embedded = false }) {
   const [session, setSession] = useState(null)
   const [error, setError] = useState('')
   const [summary, setSummary] = useState(null) // editing draft
   const [manual, setManual] = useState(false)
-  const [tab, setTab] = useState('fields')
 
   useEffect(() => {
     getHistory(sessionId)
@@ -168,7 +172,11 @@ export default function HistoryReviewPage() {
     <div className="mx-auto max-w-5xl space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-800">History: {session.patient_name}</h1>
+          {embedded ? (
+            <h2 className="text-lg font-semibold text-slate-800">Pre-visit history</h2>
+          ) : (
+            <h1 className="text-2xl font-semibold text-slate-800">History: {session.patient_name}</h1>
+          )}
           <p className="text-sm text-slate-500">
             {session.patient_id} | {session.template.replace('_', ' ')} | {LANGUAGE[session.language]} |{' '}
             {session.mode === 'manual' ? 'entered by staff' : `${session.mode} with assistant`}
@@ -246,72 +254,61 @@ export default function HistoryReviewPage() {
 
       {submitted && (
         <section className={cardClass}>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div className="inline-flex rounded-md border border-slate-200 p-0.5 text-sm">
-              {[
-                ['fields', 'Fields'],
-                ['transcript', 'Transcript'],
-                ['log', 'Edit log'],
-              ].map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setTab(key)}
-                  className={`rounded px-3 py-1 ${tab === key ? 'bg-brand-gradient text-white' : 'text-slate-600'}`}
-                >
-                  {label}
-                </button>
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-slate-800">Structured history</h2>
+            <span className="text-xs text-slate-500">{pending} field(s) awaiting review</span>
+          </div>
+          {Object.entries(groupBySection(session.fields)).map(([section, fields]) => (
+            <div key={section} className="mb-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{section}</h3>
+              {fields.map((f) => (
+                <FieldRow
+                  key={`${f.key}-${f.value}`}
+                  field={f}
+                  onAction={(action, value) => act(() => reviewHistoryField(session.id, f.key, action, value))}
+                />
               ))}
             </div>
-            {tab === 'fields' && <span className="text-xs text-slate-500">{pending} field(s) awaiting review</span>}
-          </div>
-
-          {tab === 'fields' &&
-            Object.entries(groupBySection(session.fields)).map(([section, fields]) => (
-              <div key={section} className="mb-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{section}</h3>
-                {fields.map((f) => (
-                  <FieldRow
-                    key={`${f.key}-${f.value}`}
-                    field={f}
-                    onAction={(action, value) => act(() => reviewHistoryField(session.id, f.key, action, value))}
-                  />
-                ))}
-              </div>
-            ))}
-
-          {tab === 'transcript' && (
-            <ul className="space-y-2 text-sm">
-              {session.transcript.map((m, i) => (
-                <li key={i} className={m.role === 'patient' ? 'text-slate-800' : 'text-slate-500'}>
-                  <span className="mr-2 text-xs text-slate-400">{formatTime(m.at)}</span>
-                  <b>{m.role === 'patient' ? 'Patient' : 'Assistant'}</b>
-                  {m.input === 'voice' && <span className="ml-1 text-xs text-slate-400">(spoken)</span>}: {m.text}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {tab === 'log' &&
-            (session.edit_log.length === 0 ? (
-              <p className="text-sm text-slate-400">No edits yet.</p>
-            ) : (
-              <ul className="space-y-1.5 text-sm text-slate-700">
-                {session.edit_log.map((e, i) => (
-                  <li key={i}>
-                    <span className="text-xs text-slate-400">
-                      {formatDate(e.at)} {formatTime(e.at)}
-                    </span>{' '}
-                    {e.by_role} <b>{e.action}ed</b> {e.field.replaceAll('_', ' ')}
-                    {e.action === 'edit' && (
-                      <>
-                        : <span className="text-slate-400 line-through">{e.old || '(empty)'}</span> {'->'} {e.new}
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ))}
+          ))}
         </section>
+      )}
+
+      {session.transcript.length > 0 && (
+        <details className={cardClass}>
+          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
+            Transcript ({session.transcript.length} messages)
+          </summary>
+          <ul className="mt-3 space-y-2 text-sm">
+            {session.transcript.map((m, i) => (
+              <li key={i} className={m.role === 'patient' ? 'text-slate-800' : 'text-slate-500'}>
+                <span className="mr-2 text-xs text-slate-400">{formatTime(m.at)}</span>
+                <b>{m.role === 'patient' ? 'Patient' : 'Assistant'}</b>
+                {m.input === 'voice' && <span className="ml-1 text-xs text-slate-400">(spoken)</span>}: {m.text}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
+      {session.edit_log.length > 0 && (
+        <details className={cardClass}>
+          <summary className="cursor-pointer text-sm font-semibold text-slate-800">Edit log ({session.edit_log.length})</summary>
+          <ul className="mt-3 space-y-1.5 text-sm text-slate-700">
+            {session.edit_log.map((e, i) => (
+              <li key={i}>
+                <span className="text-xs text-slate-400">
+                  {formatDate(e.at)} {formatTime(e.at)}
+                </span>{' '}
+                {e.by_role} <b>{e.action}ed</b> {e.field.replaceAll('_', ' ')}
+                {e.action === 'edit' && (
+                  <>
+                    : <span className="text-slate-400 line-through">{e.old || '(empty)'}</span> {'->'} {e.new}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
       )}
     </div>
   )

@@ -21,8 +21,17 @@ class WorkingBlock(BaseModel):
         return self
 
 
+class ConsultationFees(BaseModel):
+    """Consultation charge (INR) per visit type; None = not set yet. Billing auto-fills from these."""
+
+    new: int | None = Field(None, ge=0, le=100_000)
+    follow_up: int | None = Field(None, ge=0, le=100_000)
+    returning: int | None = Field(None, ge=0, le=100_000)
+
+
 class DoctorScheduleIn(BaseModel):
     specialization: str | None = Field(None, max_length=120)
+    fees: ConsultationFees = Field(default_factory=ConsultationFees)
     slot_minutes: int = Field(15, ge=5, le=120)
     follow_up_days: int = Field(7, ge=0, le=365, description="Follow-up window after the last paid visit")
     weekly: list[WorkingBlock] = Field(default_factory=list, max_length=50)

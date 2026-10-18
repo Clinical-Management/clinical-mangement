@@ -6,7 +6,7 @@ import DoctorSelect from '../../components/appointments/DoctorSelect'
 import { NEXT_ACTIONS, STATUS_META } from '../../components/appointments/options'
 import { cardClass, errorBox, errorMessage, formatDay, inputClass, primaryButton, secondaryButton, todayISO } from '../../components/ui'
 import { useAuth } from '../../context/AuthContext'
-import { APPOINTMENT_BASE, FRONT_DESK, ROLES } from '../../routes/roles'
+import { APPOINTMENT_BASE, FRONT_DESK, ROLES, WORKSPACE_BASE } from '../../routes/roles'
 
 const POLL_MS = 5000
 const ACTIVE = ['in_consultation', 'with_voicebot', 'waiting']
@@ -55,6 +55,8 @@ function QueueRow({ appt, base, onAction }) {
 export default function QueuePage() {
   const { user } = useAuth()
   const base = APPOINTMENT_BASE[user.role]
+  // doctors and admins open the case workspace; front desk the appointment
+  const visitBase = WORKSPACE_BASE[user.role] ?? base
   const isFrontDesk = FRONT_DESK.includes(user.role)
   const isDoctor = user.role === ROLES.DOCTOR
 
@@ -143,7 +145,7 @@ export default function QueuePage() {
         <table className="w-full text-left text-sm">
           <tbody>
             {active.map((a) => (
-              <QueueRow key={a.id} appt={a} base={base} onAction={act} />
+              <QueueRow key={a.id} appt={a} base={visitBase} onAction={act} />
             ))}
           </tbody>
         </table>

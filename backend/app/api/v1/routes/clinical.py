@@ -10,6 +10,7 @@ from app.schemas.clinical import (
     DiagnosisIn,
     DiagnosisUpdate,
     ExaminationIn,
+    NotesPatch,
     Icd10Out,
     VitalsIn,
     VitalsOut,
@@ -72,6 +73,13 @@ async def get_notes(appt: Visit, db: DB):
 @router.put("/appointments/{appointment_id}/notes/examination", response_model=ClinicalNotesOut, dependencies=[Clinical])
 async def save_examination(body: ExaminationIn, appt: Visit, db: DB, user: CurrentUser):
     return notes_out(await svc.save_examination(db, appt, body.text, body.dictated, user))
+
+
+@router.patch("/appointments/{appointment_id}/notes", response_model=ClinicalNotesOut, dependencies=[Clinical])
+async def autosave_notes(body: NotesPatch, appt: Visit, db: DB, user: CurrentUser):
+    """Autosave examination findings, private doctor notes and the visit outcome."""
+    changes = body.model_dump(exclude_unset=True, mode="json")
+    return notes_out(await svc.save_fields(db, appt, changes, user))
 
 
 @router.post("/appointments/{appointment_id}/notes/diagnoses", response_model=ClinicalNotesOut, dependencies=[Clinical])

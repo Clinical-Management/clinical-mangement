@@ -22,3 +22,7 @@ export const removeDiagnosis = (appointmentId, id) =>
   api.delete(`/appointments/${appointmentId}/notes/diagnoses/${id}`).then((r) => r.data)
 
 export const searchIcd10 = (q) => api.get('/icd10', { params: { q, limit: 12 } }).then((r) => r.data)
+
+// Autosave of examination findings, private doctor notes and visit outcome
+export const patchNotes = (appointmentId, changes) =>
+  api.patch(`/appointments/${appointmentId}/notes`, changes).then((r) => r.data)

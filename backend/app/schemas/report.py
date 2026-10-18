@@ -53,6 +53,13 @@ class ReportVersionOut(BaseModel):
     uploaded_by_role: str
 
 
+class SummaryBrief(BaseModel):
+    id: str
+    status: str
+    critical_values: list[str]
+    abnormal_count: int
+
+
 class ReportOut(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -70,6 +77,7 @@ class ReportOut(BaseModel):
     versions: list[ReportVersionOut]
     created_at: datetime
     updated_at: datetime
+    summary: SummaryBrief | None = None  # with ?include_summary=true
 
 
 class ReportUpdate(BaseModel):

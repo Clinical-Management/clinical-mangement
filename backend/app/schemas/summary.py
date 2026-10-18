@@ -66,7 +66,9 @@ class SummaryOut(BaseModel):
 
 class PatientTestOut(BaseModel):
     name: str
+    analyte_key: str
     value: str | None
+    value_numeric: float | None
     unit: str | None
     reference_range: str | None
     flag: str | None

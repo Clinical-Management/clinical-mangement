@@ -30,7 +30,7 @@ import {
   todayISO,
 } from '../../components/ui'
 import { useAuth } from '../../context/AuthContext'
-import { FRONT_DESK, PATIENT_BASE, ROLES } from '../../routes/roles'
+import { FRONT_DESK, PATIENT_BASE, ROLES, WORKSPACE_BASE } from '../../routes/roles'
 
 function Detail({ label, children }) {
   return (
@@ -181,6 +181,11 @@ export default function AppointmentDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {WORKSPACE_BASE[user.role] && (
+            <Link to={`${WORKSPACE_BASE[user.role]}/${appt.id}`} className={primaryButton}>
+              Open case workspace
+            </Link>
+          )}
           <VisitTypeBadge type={appt.visit_type} overridden={!!appt.visit_type_override} />
           <StatusBadge status={appt.status} />
         </div>

@@ -27,6 +27,7 @@ export default function DoctorSchedulePage() {
           specialization: d.specialization ?? '',
           slot_minutes: d.slot_minutes,
           follow_up_days: d.follow_up_days,
+          fees: { new: d.fees?.new ?? '', follow_up: d.fees?.follow_up ?? '', returning: d.fees?.returning ?? '' },
           weekly: d.weekly,
         })
       })
@@ -43,6 +44,7 @@ export default function DoctorSchedulePage() {
         specialization: form.specialization || null,
         slot_minutes: Number(form.slot_minutes),
         follow_up_days: Number(form.follow_up_days),
+        fees: Object.fromEntries(Object.entries(form.fees).map(([k, v]) => [k, v === '' ? null : Number(v)])),
       })
       setDoctor(saved)
       setMessage('Schedule saved. Existing bookings are kept.')
@@ -90,6 +92,31 @@ export default function DoctorSchedulePage() {
             <span className={labelClass}>Follow-up window (days after a paid visit)</span>
             {number('follow_up_days', { min: 0, max: 365 })}
           </label>
+        </div>
+
+        <div>
+          <h2 className="mb-1 text-sm font-semibold text-slate-800">Consultation fees (₹)</h2>
+          <p className="mb-2 text-xs text-slate-500">Billing fills these in automatically from the visit type.</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              ['new', 'New visit'],
+              ['follow_up', 'Follow-up (within window)'],
+              ['returning', 'Returning'],
+            ].map(([key, label]) => (
+              <label key={key}>
+                <span className={labelClass}>{label}</span>
+                <input
+                  type="number"
+                  min={0}
+                  className={inputClass}
+                  placeholder="Not set"
+                  value={form.fees[key]}
+                  disabled={!isAdmin}
+                  onChange={(e) => setForm({ ...form, fees: { ...form.fees, [key]: e.target.value } })}
+                />
+              </label>
+            ))}
+          </div>
         </div>
 
         <div>

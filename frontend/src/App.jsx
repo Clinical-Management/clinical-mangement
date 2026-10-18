@@ -30,6 +30,7 @@ const DoctorSchedulePage = lazy(() => import('./pages/scheduling/DoctorScheduleP
 const DoctorsPage = lazy(() => import('./pages/scheduling/DoctorsPage'))
 const HolidaysPage = lazy(() => import('./pages/scheduling/HolidaysPage'))
 const VoicebotPage = lazy(() => import('./pages/voice/VoicebotPage'))
+const CaseWorkspacePage = lazy(() => import('./pages/workspace/CaseWorkspacePage'))
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -85,6 +86,7 @@ export default function App() {
           <Route path="doctors" element={<DoctorsPage />} />
           <Route path="doctors/:doctorId" element={<DoctorSchedulePage />} />
           <Route path="holidays" element={<HolidaysPage />} />
+          <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
           <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
       </Route>
@@ -96,6 +98,7 @@ export default function App() {
           {appointmentRoutes({ canBook: false })}
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<DoctorSchedulePage />} />
+          <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
           <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
       </Route>

@@ -17,6 +17,9 @@ export const APPOINTMENT_BASE = {
   patient: '/patient/appointments',
 }
 
+// Case workspace (tabbed consultation view): clinical roles only
+export const WORKSPACE_BASE = { admin: '/admin/visits', doctor: '/doctor/visits' }
+
 // Pre-visit history (voicebot) review: clinical roles only
 export const HISTORY_BASE = { admin: '/admin/history', doctor: '/doctor/history' }
 

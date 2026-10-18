@@ -111,6 +111,8 @@ async def get_notes(db: AsyncDatabase, appt: dict) -> dict:
         "patient_id": appt["patient_id"],
         "examination": "",
         "examination_updated_at": None,
+        "doctor_notes": "",
+        "outcome": None,
         "diagnoses": [],
         "changes": [],
     }
@@ -120,7 +122,7 @@ async def _update_notes(db: AsyncDatabase, appt: dict, update: dict, change: str
     update.setdefault("$set", {}).update({"updated_at": _now()})
     # First write creates the document: fill defaults for fields this update doesn't touch
     touched = {key.split(".")[0] for op in update.values() for key in op}
-    defaults = {"examination": "", "examination_updated_at": None, "diagnoses": []}
+    defaults = {"examination": "", "examination_updated_at": None, "diagnoses": [], "doctor_notes": "", "outcome": None}
     update["$setOnInsert"] = {
         "patient_id": appt["patient_id"],
         "doctor_id": appt["doctor_id"],
@@ -130,6 +132,42 @@ async def _update_notes(db: AsyncDatabase, appt: dict, update: dict, change: str
     return await db.clinical_notes.find_one_and_update(
         {"appointment_id": appt["_id"]}, update, upsert=True, return_document=ReturnDocument.AFTER
     )
+
+
+AUTOSAVE_WINDOW_MINUTES = 10
+
+
+async def save_fields(db: AsyncDatabase, appt: dict, changes: dict, actor: dict) -> dict:
+    """Autosave of the free-text parts (examination, private doctor notes, visit outcome).
+    Repeated saves by the same person within a few minutes count as one entry in the change log."""
+    notes = await get_notes(db, appt)
+    sets, labels = {}, []
+    if "examination" in changes and changes["examination"] != notes["examination"]:
+        sets.update({"examination": changes["examination"], "examination_updated_at": _now()})
+        labels.append("Examination findings updated" + (" (dictated)" if changes.get("dictated") else ""))
+    if "doctor_notes" in changes and changes["doctor_notes"] != notes.get("doctor_notes", ""):
+        sets["doctor_notes"] = changes["doctor_notes"]
+        labels.append("Doctor notes updated")
+    if "outcome" in changes and changes["outcome"] != notes.get("outcome"):
+        sets["outcome"] = changes["outcome"]
+        labels.append("Visit outcome updated")
+    if not sets:
+        return notes
+    change = "; ".join(labels)
+    last = notes["changes"][-1] if notes["changes"] else None
+    recent = (
+        last
+        and last["change"] == change
+        and last.get("by") == actor["_id"]
+        and (_now() - last["at"].replace(tzinfo=last["at"].tzinfo or timezone.utc)).total_seconds() < AUTOSAVE_WINDOW_MINUTES * 60
+    )
+    if recent:
+        sets[f"changes.{len(notes['changes']) - 1}.at"] = _now()
+        sets["updated_at"] = _now()
+        return await db.clinical_notes.find_one_and_update(
+            {"appointment_id": appt["_id"]}, {"$set": sets}, return_document=ReturnDocument.AFTER
+        )
+    return await _update_notes(db, appt, {"$set": sets}, change, actor)
 
 
 async def save_examination(db: AsyncDatabase, appt: dict, text: str, dictated: bool, actor: dict) -> dict:

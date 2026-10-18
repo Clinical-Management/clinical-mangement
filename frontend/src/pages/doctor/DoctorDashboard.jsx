@@ -1,18 +1,18 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { updateStatus } from '../../api/appointments'
 import PatientRow from '../../components/dashboard/PatientRow'
 import StatTiles from '../../components/dashboard/StatTiles'
 import useToday from '../../components/dashboard/useToday'
 import { cardClass, formatDay, primaryButton, todayISO } from '../../components/ui'
 import { useAuth } from '../../context/AuthContext'
-import { APPOINTMENT_BASE, HISTORY_BASE } from '../../routes/roles'
+import { HISTORY_BASE, WORKSPACE_BASE } from '../../routes/roles'
 
-const base = APPOINTMENT_BASE.doctor
+const base = WORKSPACE_BASE.doctor
 const ORDER = ['in_consultation', 'with_voicebot', 'waiting']
 
 export default function DoctorDashboard() {
   const { user } = useAuth()
-  const { queue, expected, counts, loaded, reload } = useToday()
+  const { queue, expected, counts, loaded } = useToday()
 
   // Red flags first, then whoever is with the doctor, then by token
   const active = queue
@@ -22,9 +22,10 @@ export default function DoctorDashboard() {
   const next = active.find((a) => a.status === 'waiting')
   const historiesToReview = queue.filter((a) => a.history_status === 'submitted' && a.status !== 'completed')
 
+  const navigate = useNavigate()
   const callIn = async (appt) => {
     await updateStatus(appt.id, 'in_consultation')
-    reload()
+    navigate(`${base}/${appt.id}`)
   }
 
   return (

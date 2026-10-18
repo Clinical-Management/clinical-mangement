@@ -71,12 +71,27 @@ async def report_library(
     date_from: date | None = None,
     date_to: date | None = None,
     appointment_id: str | None = None,
+    include_summary: bool = False,
 ):
-    """A patient's reports, newest report date first, filterable by type, date range and visit."""
+    """A patient's reports, newest report date first, filterable by type, date range and visit.
+    `include_summary` adds each report's AI-summary status (clinical staff only)."""
     patient = await svc.patient_for(db, patient_id, user)
-    return await svc.list_reports(
+    reports = await svc.list_reports(
         db, patient["patient_id"], report_type=report_type, date_from=date_from, date_to=date_to, appointment_id=appointment_id
     )
+    if include_summary and user["role"] in ("admin", "doctor"):
+        summaries = {}
+        async for s in db.report_summaries.find({"report_id": {"$in": [r["_id"] for r in reports]}}).sort("report_version", 1):
+            summaries[s["report_id"]] = s  # latest version wins
+        for r in reports:
+            if s := summaries.get(r["_id"]):
+                r["summary"] = {
+                    "id": str(s["_id"]),
+                    "status": s["status"],
+                    "critical_values": s["critical_values"],
+                    "abnormal_count": sum(1 for t in s["tests"] if t["flag"] not in (None, "normal")),
+                }
+    return reports
 
 
 @router.post("/patients/{patient_id}/reports/export", dependencies=[Uploaders])

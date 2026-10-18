@@ -87,6 +87,20 @@ class ExaminationIn(BaseModel):
     dictated: bool = False
 
 
+class Outcome(BaseModel):
+    status: Literal["resolved", "improving", "unchanged", "worse", "referred", "admitted"]
+    note: str | None = Field(None, max_length=500)
+
+
+class NotesPatch(BaseModel):
+    """Autosave of any subset of the free-text parts of the visit notes."""
+
+    examination: str | None = Field(None, max_length=20000)
+    dictated: bool = False
+    doctor_notes: str | None = Field(None, max_length=20000)
+    outcome: Outcome | None = None
+
+
 class DiagnosisIn(BaseModel):
     code: str = Field(min_length=1, max_length=10)
     status: Literal["provisional", "final"] = "provisional"
@@ -119,6 +133,8 @@ class ClinicalNotesOut(BaseModel):
     patient_id: str
     examination: str
     examination_updated_at: datetime | None
+    doctor_notes: str = ""
+    outcome: Outcome | None = None
     diagnoses: list[DiagnosisOut]
     changes: list[NoteChange]
 

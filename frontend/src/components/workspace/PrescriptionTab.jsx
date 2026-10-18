@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { patchNotes } from '../../api/clinical'
+import { getCaseSummary } from '../../api/caseSummary'
 import { getPrescription, savePrescription } from '../../api/workspace'
 import { useAuth } from '../../context/AuthContext'
 import useAutosave from '../../hooks/useAutosave'
-import { APPOINTMENT_BASE } from '../../routes/roles'
+import { APPOINTMENT_BASE, WORKSPACE_BASE } from '../../routes/roles'
 import { cardClass, formatDate, inputClass, labelClass } from '../ui'
 import SaveIndicator from './SaveIndicator'
 
@@ -41,6 +42,7 @@ function toPayload(rx) {
       rx.follow_up.in_days !== '' || rx.follow_up.note.trim()
         ? { in_days: rx.follow_up.in_days === '' ? null : Number(rx.follow_up.in_days), note: clean(rx.follow_up.note) }
         : null,
+    summary_sections: rx.summary_sections,
   }
 }
 
@@ -50,13 +52,15 @@ function fromServer(p) {
     investigations: p.investigations.map((i) => ({ name: i.name, notes: i.notes ?? '' })),
     advice: p.advice ?? '',
     follow_up: { in_days: p.follow_up?.in_days ?? '', note: p.follow_up?.note ?? '' },
+    summary_sections: p.summary_sections ?? {},
   }
 }
 
-export default function PrescriptionTab({ appt, notes, onNotesSaved }) {
+export default function PrescriptionTab({ appt, notes, onNotesSaved, active = true }) {
   const { user } = useAuth()
   const [rx, setRx] = useState(null)
   const [server, setServer] = useState(null) // last saved (warnings, follow-up date)
+  const [caseSummary, setCaseSummary] = useState(undefined) // undefined = loading, null = none
   const [outcome, setOutcome] = useState({ status: notes.outcome?.status ?? '', note: notes.outcome?.note ?? '' })
 
   const save = useCallback(async (draft) => setServer(await savePrescription(appt.id, toPayload(draft))), [appt.id])
@@ -67,6 +71,11 @@ export default function PrescriptionTab({ appt, notes, onNotesSaved }) {
   )
   const outcomeSave = useAutosave(outcome, saveOutcome)
   const { reset } = autosave
+
+  // re-checked each time the tab is shown: the summary may have been finalized meanwhile
+  useEffect(() => {
+    if (active) getCaseSummary(appt.id).then(setCaseSummary).catch(() => setCaseSummary(null))
+  }, [appt.id, active])
 
   useEffect(() => {
     getPrescription(appt.id).then((p) => {
@@ -180,6 +189,34 @@ export default function PrescriptionTab({ appt, notes, onNotesSaved }) {
       <section className={cardClass}>
         <h2 className="mb-2 text-sm font-semibold text-slate-800">Advice</h2>
         <textarea className={inputClass} rows={4} placeholder="Diet, activity, warning signs to return early..." value={rx.advice} onChange={(e) => setRx({ ...rx, advice: e.target.value })} />
+      </section>
+
+      <section className={cardClass}>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-slate-800">Case summary in the prescription</h2>
+          <a href={`${WORKSPACE_BASE[user.role]}/${appt.id}/print`} target="_blank" rel="noreferrer" className="text-sm font-medium text-brand-600 hover:underline">
+            Print prescription
+          </a>
+        </div>
+        {caseSummary?.status === 'final' ? (
+          <div className="grid gap-2 sm:grid-cols-3">
+            {caseSummary.sections.map((s) => (
+              <label key={s.key} className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  // plan is off by default: the prescription already lists it
+                  checked={rx.summary_sections[s.key] ?? s.key !== 'plan'}
+                  onChange={(e) => setRx({ ...rx, summary_sections: { ...rx.summary_sections, [s.key]: e.target.checked } })}
+                />
+                {s.title}
+              </label>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">
+            {caseSummary === undefined ? 'Loading...' : 'Finalize the case summary (Case summary tab) to include it in the printed prescription.'}
+          </p>
+        )}
       </section>
 
       <section className={cardClass}>

@@ -75,3 +75,19 @@ def no_real_report_ai():
     app.dependency_overrides[get_summary_engine_factory] = lambda: (lambda: Disabled())
     yield
     app.dependency_overrides.pop(get_summary_engine_factory, None)
+
+
+@pytest.fixture(autouse=True)
+def no_real_case_summary_ai():
+    """Case summaries fall back to the rule-based writer in tests unless a test installs a fake."""
+    from app.ai.client import EngineError
+    from app.api.v1.routes.case_summary import get_writer_factory
+    from app.main import app
+
+    class Disabled:
+        async def write(self, ctx):
+            raise EngineError("AI disabled in tests")
+
+    app.dependency_overrides[get_writer_factory] = lambda: (lambda: Disabled())
+    yield
+    app.dependency_overrides.pop(get_writer_factory, None)

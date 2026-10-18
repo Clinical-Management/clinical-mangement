@@ -59,7 +59,8 @@ def allergy_warnings(medicines: list[dict], allergies: list[dict]) -> list[dict]
 
 async def get(db: AsyncDatabase, appt: dict) -> dict:
     doc = await db.prescriptions.find_one({"appointment_id": appt["_id"]}) or {
-        "medicines": [], "investigations": [], "advice": "", "follow_up": None, "updated_at": None, "updated_by_role": None,
+        "medicines": [], "investigations": [], "advice": "", "follow_up": None, "summary_sections": {},
+        "updated_at": None, "updated_by_role": None,
     }
     patient = await patient_service.get_patient(db, appt["patient_id"])
     allergies = (patient.get("medical") or {}).get("allergies", [])

@@ -10,6 +10,7 @@ import StartHistoryPanel from '../../components/history/StartHistoryPanel'
 import { GENDERS, labelOf } from '../../components/patients/options'
 import { errorBox, errorMessage, primaryButton, secondaryButton } from '../../components/ui'
 import BillingTab from '../../components/workspace/BillingTab'
+import CaseSummaryTab from '../../components/workspace/CaseSummaryTab'
 import OverviewTab from '../../components/workspace/OverviewTab'
 import PastVisitsTab from '../../components/workspace/PastVisitsTab'
 import PrescriptionTab from '../../components/workspace/PrescriptionTab'
@@ -25,6 +26,7 @@ const TABS = [
   ['reports', 'Reports'],
   ['examination', 'Examination'],
   ['diagnosis', 'Diagnosis'],
+  ['summary', 'Case summary'],
   ['prescription', 'Prescription'],
   ['past', 'Past visits'],
   ['billing', 'Billing'],
@@ -171,7 +173,8 @@ export default function CaseWorkspacePage() {
           <NotesChangeLog notes={notes} />
         </div>,
       )}
-      {panel('prescription', <PrescriptionTab appt={appt} notes={notes} onNotesSaved={setNotes} />)}
+      {panel('summary', <CaseSummaryTab appt={appt} active={tab === 'summary'} />)}
+      {panel('prescription', <PrescriptionTab appt={appt} notes={notes} onNotesSaved={setNotes} active={tab === 'prescription'} />)}
       {panel('past', <PastVisitsTab appt={appt} />)}
       {panel('billing', <BillingTab appt={appt} onPaid={reloadAppt} />)}
     </div>

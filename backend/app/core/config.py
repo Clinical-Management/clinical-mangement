@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     report_model: str = "claude-opus-5-5"
     report_effort: str = "high"  # accuracy over speed: values feed clinical decisions
 
+    # Case summary drafting
+    case_summary_model: str = "claude-opus-5-5"
+    case_summary_effort: str = "medium"
+
     # Report uploads (stored in MongoDB GridFS)
     report_max_mb: int = 25
 

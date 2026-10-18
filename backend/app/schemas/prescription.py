@@ -29,6 +29,8 @@ class PrescriptionIn(BaseModel):
     investigations: list[Investigation] = Field(default_factory=list, max_length=50)
     advice: str = Field("", max_length=4000)
     follow_up: FollowUp | None = None
+    # which finalized case-summary sections to print in the prescription (missing = included)
+    summary_sections: dict[str, bool] = Field(default_factory=dict)
 
 
 class AllergyWarning(BaseModel):

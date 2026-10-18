@@ -31,6 +31,7 @@ const DoctorsPage = lazy(() => import('./pages/scheduling/DoctorsPage'))
 const HolidaysPage = lazy(() => import('./pages/scheduling/HolidaysPage'))
 const VoicebotPage = lazy(() => import('./pages/voice/VoicebotPage'))
 const CaseWorkspacePage = lazy(() => import('./pages/workspace/CaseWorkspacePage'))
+const PrescriptionPrintPage = lazy(() => import('./pages/workspace/PrescriptionPrintPage'))
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -78,6 +79,8 @@ export default function App() {
       <Route path="/voice/:sessionId" element={<VoicebotPage />} />
 
       <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
+        {/* printable pages sit outside the dashboard layout */}
+        <Route path="/admin/visits/:appointmentId/print" element={<PrescriptionPrintPage />} />
         <Route path="/admin" element={<DashboardLayout />}>
           <Route index element={<AdminDashboard />} />
           {patientRoutes('patients')}
@@ -92,6 +95,7 @@ export default function App() {
       </Route>
 
       <Route element={<ProtectedRoute roles={[ROLES.DOCTOR]} />}>
+        <Route path="/doctor/visits/:appointmentId/print" element={<PrescriptionPrintPage />} />
         <Route path="/doctor" element={<DashboardLayout />}>
           <Route index element={<DoctorDashboard />} />
           {patientRoutes('patients', { canRegister: false, canEdit: false })}

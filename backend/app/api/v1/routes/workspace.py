@@ -4,9 +4,8 @@ from fastapi import APIRouter, Depends
 
 from app.core.deps import DB, CurrentUser, require_roles
 from app.schemas.billing import BillIn, BillOut, PayIn, WaiveIn
-from app.schemas.prescription import PrescriptionIn, PrescriptionOut
 from app.schemas.user import Role
-from app.services import appointment_service, billing_service, prescription_service, report_service, visit_service
+from app.services import appointment_service, billing_service, report_service, visit_service
 
 router = APIRouter(tags=["case workspace"])
 
@@ -19,21 +18,6 @@ async def visit(appointment_id: str, db: DB, user: CurrentUser) -> dict:
 
 
 Visit = Annotated[dict, Depends(visit)]
-
-
-# --- prescription ------------------------------------------------------------
-
-
-@router.get("/appointments/{appointment_id}/prescription", response_model=PrescriptionOut, dependencies=[Clinical])
-async def get_prescription(appt: Visit, db: DB):
-    return await prescription_service.get(db, appt)
-
-
-@router.put("/appointments/{appointment_id}/prescription", response_model=PrescriptionOut, dependencies=[Clinical])
-async def save_prescription(body: PrescriptionIn, appt: Visit, db: DB, user: CurrentUser):
-    """Autosaved as a whole: medicines, investigations, advice and follow-up.
-    Returns allergy warnings for medicines that match the patient's recorded allergies."""
-    return await prescription_service.save(db, appt, body, user)
 
 
 # --- billing -----------------------------------------------------------------

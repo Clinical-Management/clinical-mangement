@@ -16,6 +16,7 @@ import SlotPicker from '../../components/appointments/SlotPicker'
 import ClinicalNotesPanel from '../../components/clinical/ClinicalNotesPanel'
 import VitalsPanel from '../../components/clinical/VitalsPanel'
 import StartHistoryPanel from '../../components/history/StartHistoryPanel'
+import PrescriptionVersions from '../../components/prescriptions/PrescriptionVersions'
 import { labelOf } from '../../components/patients/options'
 import {
   cardClass,
@@ -327,6 +328,9 @@ export default function AppointmentDetailPage() {
       </section>
 
       {(isDoctor || user.role === ROLES.ADMIN) && <ClinicalNotesPanel appt={appt} />}
+
+      {/* clinical roles work with the prescription in the case workspace */}
+      {!WORKSPACE_BASE[user.role] && <PrescriptionVersions appt={appt} canDeliver={!isOwner} />}
 
       <section className={cardClass}>
         <h2 className="mb-3 text-sm font-semibold text-slate-800">History</h2>

@@ -16,11 +16,12 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     // Expired/invalid token: drop it and bounce to login (except on the login call itself,
-    // and on kiosk / patient-phone voicebot links, which have no login)
+    // on kiosk / patient-phone voicebot links, and on the prescription QR / patient-link pages, which have no login)
     const isLinkRequest = Boolean(err.config?.headers?.['X-History-Token'])
+    const onPublicPage = /^\/(verify|rx)\//.test(window.location.pathname)
     if (err.response?.status === 401 && !err.config.url.endsWith('/auth/login') && !isLinkRequest) {
       localStorage.removeItem(TOKEN_KEY)
-      window.location.assign('/login')
+      if (!onPublicPage) window.location.assign('/login')
     }
     return Promise.reject(err)
   },

@@ -51,6 +51,10 @@ class DoctorOut(DoctorScheduleIn):
     id: PyObjectId = Field(validation_alias="_id")
     full_name: str
     email: str
+    registration_number: str | None = None
+    registration_council: str | None = None
+    qualifications: str | None = None
+    has_signature: bool = False
 
 
 class LeaveIn(BaseModel):

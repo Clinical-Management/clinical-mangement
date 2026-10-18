@@ -31,7 +31,9 @@ const DoctorsPage = lazy(() => import('./pages/scheduling/DoctorsPage'))
 const HolidaysPage = lazy(() => import('./pages/scheduling/HolidaysPage'))
 const VoicebotPage = lazy(() => import('./pages/voice/VoicebotPage'))
 const CaseWorkspacePage = lazy(() => import('./pages/workspace/CaseWorkspacePage'))
-const PrescriptionPrintPage = lazy(() => import('./pages/workspace/PrescriptionPrintPage'))
+const ClinicSettingsPage = lazy(() => import('./pages/admin/ClinicSettingsPage'))
+const PatientPrescriptionPage = lazy(() => import('./pages/public/PatientPrescriptionPage'))
+const VerifyPrescriptionPage = lazy(() => import('./pages/public/VerifyPrescriptionPage'))
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -77,10 +79,11 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       {/* Voicebot: full screen, opened with a kiosk/phone link token or by a logged-in patient */}
       <Route path="/voice/:sessionId" element={<VoicebotPage />} />
+      {/* Prescriptions without login: QR verification and the patient's delivery link */}
+      <Route path="/verify/:publicId" element={<VerifyPrescriptionPage />} />
+      <Route path="/rx/:publicId" element={<PatientPrescriptionPage />} />
 
       <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
-        {/* printable pages sit outside the dashboard layout */}
-        <Route path="/admin/visits/:appointmentId/print" element={<PrescriptionPrintPage />} />
         <Route path="/admin" element={<DashboardLayout />}>
           <Route index element={<AdminDashboard />} />
           {patientRoutes('patients')}
@@ -89,13 +92,13 @@ export default function App() {
           <Route path="doctors" element={<DoctorsPage />} />
           <Route path="doctors/:doctorId" element={<DoctorSchedulePage />} />
           <Route path="holidays" element={<HolidaysPage />} />
+          <Route path="settings/clinic" element={<ClinicSettingsPage />} />
           <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
           <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
       </Route>
 
       <Route element={<ProtectedRoute roles={[ROLES.DOCTOR]} />}>
-        <Route path="/doctor/visits/:appointmentId/print" element={<PrescriptionPrintPage />} />
         <Route path="/doctor" element={<DashboardLayout />}>
           <Route index element={<DoctorDashboard />} />
           {patientRoutes('patients', { canRegister: false, canEdit: false })}

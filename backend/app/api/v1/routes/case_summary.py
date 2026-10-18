@@ -97,5 +97,5 @@ async def printable_prescription(appt: Visit, db: DB):
         "token": appt.get("token"),
         "case_summary": await svc.finalized_sections(db, appt, rx.get("summary_sections")),
         "case_summary_status": doc["status"] if doc else None,
-        "prescription": {k: rx.get(k) for k in ("medicines", "investigations", "advice", "follow_up", "allergy_warnings")},
+        "prescription": {k: rx.get(k) for k in ("medicines", "investigations", "advice", "diet_lifestyle", "referral", "follow_up")},
     }

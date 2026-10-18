@@ -15,4 +15,3 @@ export const finalizeCaseSummary = (id) => api.post(`${base(id)}/finalize`).then
 
 export const reopenCaseSummary = (id) => api.post(`${base(id)}/reopen`).then((r) => r.data)
 
-export const getPrintablePrescription = (id) => api.get(`/appointments/${id}/prescription/print`).then((r) => r.data)

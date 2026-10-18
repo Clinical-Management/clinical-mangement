@@ -35,13 +35,14 @@ export const ROLE_NAV = {
     { to: '/admin/patients', label: 'Patients' },
     { to: '/admin/doctors', label: 'Doctors' },
     { to: '/admin/holidays', label: 'Holidays' },
+    { to: '/admin/settings/clinic', label: 'Clinic letterhead' },
   ],
   doctor: [
     { to: '/doctor', label: 'Dashboard', end: true },
     { to: '/doctor/queue', label: 'My queue' },
     { to: '/doctor/appointments', label: 'Appointments' },
     { to: '/doctor/patients', label: 'Patients' },
-    { to: '/doctor/schedule', label: 'My schedule' },
+    { to: '/doctor/schedule', label: 'My schedule & letterhead' },
   ],
   receptionist: [
     { to: '/reception', label: 'Dashboard', end: true },

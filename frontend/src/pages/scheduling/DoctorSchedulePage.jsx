@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { getDoctor, saveSchedule } from '../../api/doctors'
 import LeavesPanel from '../../components/appointments/LeavesPanel'
 import WeeklySchedule from '../../components/appointments/WeeklySchedule'
+import CredentialsPanel from '../../components/prescriptions/CredentialsPanel'
 import { cardClass, errorBox, errorMessage, inputClass, labelClass, primaryButton } from '../../components/ui'
 import { useAuth } from '../../context/AuthContext'
 import { ROLES } from '../../routes/roles'
@@ -130,6 +131,8 @@ export default function DoctorSchedulePage() {
           </div>
         )}
       </form>
+
+      <CredentialsPanel doctor={doctor} />
 
       <LeavesPanel doctorId={doctorId} />
     </div>

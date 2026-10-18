@@ -27,7 +27,7 @@ def test_prescription_autosave_and_allergy_warnings(client, clinic):
     url = f"{APPT}/{appt}/prescription"
 
     empty = client.get(url, headers=clinic["doctor"]).json()
-    assert empty["medicines"] == [] and empty["allergy_warnings"] == []
+    assert empty["medicines"] == [] and empty["checks"] == [] and empty["status"] == "draft"
 
     body = {
         "medicines": [
@@ -40,7 +40,8 @@ def test_prescription_autosave_and_allergy_warnings(client, clinic):
     }
     saved = client.put(url, json=body, headers=clinic["doctor"]).json()
     assert saved["follow_up"]["date"] == "2030-01-12"  # visit 2030-01-07 + 5 days
-    assert [(w["medicine"], w["reason"]) for w in saved["allergy_warnings"]] == [("Amoxicillin", "penicillin class")]
+    allergy = [c for c in saved["checks"] if c["type"] == "allergy"]
+    assert [(c["medicines"], c["severity"]) for c in allergy] == [(["Amoxicillin"], "high")]
     assert client.get(url, headers=clinic["doctor"]).json()["advice"] == "Plenty of fluids."
 
     assert client.put(url, json=body, headers=clinic["desk"]).status_code == 403  # receptionists don't prescribe

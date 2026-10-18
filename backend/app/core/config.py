@@ -36,6 +36,17 @@ class Settings(BaseSettings):
     case_summary_model: str = "claude-opus-5-5"
     case_summary_effort: str = "medium"
 
+    # Prescriptions: signing key for the verification QR (falls back to JWT_SECRET), public app URL
+    # used in QR codes and patient links, and optional SMTP for emailing PDFs
+    prescription_signing_key: str | None = None
+    frontend_url: str = "http://localhost:5173"
+    patient_link_days: int = 30
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str | None = None
+
     # Report uploads (stored in MongoDB GridFS)
     report_max_mb: int = 25
 

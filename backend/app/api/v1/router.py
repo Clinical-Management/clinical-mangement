@@ -13,6 +13,7 @@ from app.api.v1.routes import (
     ml,
     patient,
     patients,
+    prescriptions,
     receptionist,
     reports,
     summaries,
@@ -35,4 +36,5 @@ api_router.include_router(reports.router)
 api_router.include_router(summaries.router)
 api_router.include_router(workspace.router)
 api_router.include_router(case_summary.router)
+api_router.include_router(prescriptions.router)
 api_router.include_router(ml.router)

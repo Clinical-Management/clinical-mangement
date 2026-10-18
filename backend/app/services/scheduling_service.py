@@ -19,14 +19,20 @@ async def get_doctor(db: AsyncDatabase, doctor_id: str | ObjectId) -> dict:
     if not user:
         raise NotFound("Doctor not found")
     profile = await db.doctor_profiles.find_one({"_id": oid}) or {}
-    return {**user, **DEFAULT_PROFILE, **{k: v for k, v in profile.items() if k != "_id"}}
+    return {**user, **DEFAULT_PROFILE, **{k: v for k, v in profile.items() if k != "_id"}, "has_signature": bool(profile.get("signature_file_id"))}
 
 
 async def list_doctors(db: AsyncDatabase) -> list[dict]:
     users = await db.users.find({"role": "doctor", "is_active": True}).sort("full_name", 1).to_list()
     profiles = {p["_id"]: p for p in await db.doctor_profiles.find({"_id": {"$in": [u["_id"] for u in users]}}).to_list()}
     return [
-        {**u, **DEFAULT_PROFILE, **{k: v for k, v in profiles.get(u["_id"], {}).items() if k != "_id"}} for u in users
+        {
+            **u,
+            **DEFAULT_PROFILE,
+            **{k: v for k, v in profiles.get(u["_id"], {}).items() if k != "_id"},
+            "has_signature": bool(profiles.get(u["_id"], {}).get("signature_file_id")),
+        }
+        for u in users
     ]
 
 

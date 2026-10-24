@@ -1,4 +1,7 @@
+import logging
 from contextlib import asynccontextmanager
+
+import jwt
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,8 +10,12 @@ from fastapi.responses import JSONResponse
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.errors import DomainError
+from app.core.security import decode_access_token
 from app.history.engine import EngineError
-from app.db.mongodb import close_mongo_connection, connect_to_mongo
+from app.db.mongodb import close_mongo_connection, connect_to_mongo, mongo
+from app.services import audit_service
+
+log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -27,6 +34,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def audit_requests(request: Request, call_next):
+    """Logs signed-in users' views and changes of patient records (see audit_service)."""
+    response = await call_next(request)
+    auth = request.headers.get("authorization", "")
+    path = request.url.path
+    if auth.lower().startswith("bearer ") and path.startswith(settings.api_prefix) and response.status_code != 401:
+        try:
+            claims = decode_access_token(auth[7:])
+        except jwt.PyJWTError:
+            return response
+        ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (request.client and request.client.host)
+        try:
+            await audit_service.log_request(
+                mongo.db, path=path[len(settings.api_prefix) :], method=request.method, status=response.status_code, claims=claims, ip=ip
+            )
+        except Exception:  # never fail the user's request because of logging
+            log.exception("audit log write failed")
+    return response
 
 
 @app.exception_handler(DomainError)

@@ -35,6 +35,8 @@ export const ROLE_NAV = {
     { to: '/admin/patients', label: 'Patients' },
     { to: '/admin/doctors', label: 'Doctors' },
     { to: '/admin/holidays', label: 'Holidays' },
+    { to: '/admin/staff', label: 'Staff' },
+    { to: '/admin/audit', label: 'Audit log' },
     { to: '/admin/settings/clinic', label: 'Clinic letterhead' },
   ],
   doctor: [

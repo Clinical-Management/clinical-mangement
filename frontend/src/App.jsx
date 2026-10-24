@@ -32,7 +32,10 @@ const DoctorsPage = lazy(() => import('./pages/scheduling/DoctorsPage'))
 const HolidaysPage = lazy(() => import('./pages/scheduling/HolidaysPage'))
 const VoicebotPage = lazy(() => import('./pages/voice/VoicebotPage'))
 const CaseWorkspacePage = lazy(() => import('./pages/workspace/CaseWorkspacePage'))
+const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
 const ClinicSettingsPage = lazy(() => import('./pages/admin/ClinicSettingsPage'))
+const SecurityPage = lazy(() => import('./pages/account/SecurityPage'))
+const StaffPage = lazy(() => import('./pages/admin/StaffPage'))
 const PatientPrescriptionPage = lazy(() => import('./pages/public/PatientPrescriptionPage'))
 const VerifyPrescriptionPage = lazy(() => import('./pages/public/VerifyPrescriptionPage'))
 
@@ -94,6 +97,9 @@ export default function App() {
           <Route path="doctors/:doctorId" element={<DoctorSchedulePage />} />
           <Route path="holidays" element={<HolidaysPage />} />
           <Route path="settings/clinic" element={<ClinicSettingsPage />} />
+          <Route path="staff" element={<StaffPage />} />
+          <Route path="audit" element={<AuditLogPage />} />
+          <Route path="security" element={<SecurityPage />} />
           <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
           <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
@@ -106,6 +112,7 @@ export default function App() {
           {appointmentRoutes({ canBook: false })}
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<DoctorSchedulePage />} />
+          <Route path="security" element={<SecurityPage />} />
           <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
           <Route path="history/:sessionId" element={<HistoryReviewPage />} />
         </Route>
@@ -117,6 +124,7 @@ export default function App() {
           {patientRoutes('patients')}
           {appointmentRoutes()}
           <Route path="queue" element={<QueuePage />} />
+          <Route path="security" element={<SecurityPage />} />
         </Route>
       </Route>
 

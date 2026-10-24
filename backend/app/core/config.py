@@ -15,7 +15,18 @@ class Settings(BaseSettings):
 
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
-    jwt_expire_minutes: int = 60 * 24
+    # Sessions: staff are signed out after this much inactivity (the app refreshes the token while in use)
+    # and must re-enter their password after the absolute limit; patients stay signed in for a week
+    staff_idle_minutes: int = 30
+    staff_session_max_hours: int = 12
+    patient_session_minutes: int = 60 * 24 * 7
+    # Staff must set up an authenticator app (TOTP) before their first sign-in completes
+    staff_mfa_required: bool = True
+
+    # Encryption at rest for uploaded files and secrets (32 bytes, base64; see app/core/crypto.py)
+    data_encryption_key: str | None = None
+    # Signs audit log entries so edits and deletions are detectable (falls back to JWT_SECRET)
+    audit_signing_key: str | None = None
 
     # All appointment dates/times are clinic-local
     clinic_timezone: str = "Asia/Kolkata"

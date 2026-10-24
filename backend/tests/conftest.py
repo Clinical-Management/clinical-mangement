@@ -3,6 +3,8 @@ from datetime import datetime
 
 # Must be set before the app (and its settings) are imported
 os.environ["MONGODB_DB"] = "clinical_management_test"
+# Staff MFA is covered by its own tests; elsewhere staff sign in with a password only
+os.environ["STAFF_MFA_REQUIRED"] = "false"
 
 import pytest
 from fastapi.testclient import TestClient

@@ -68,6 +68,12 @@ async def ensure_indexes() -> None:
     await mongo.db.rx_favourites.create_index([("doctor_id", ASCENDING)])
     await mongo.db.medicines.create_index([("search", ASCENDING)])
 
+    audit = mongo.db.audit_log
+    await audit.create_index([("seq", ASCENDING)], unique=True)
+    await audit.create_index([("patient_id", ASCENDING), ("seq", DESCENDING)])
+    await audit.create_index([("actor_id", ASCENDING), ("seq", DESCENDING)])
+    await audit.create_index([("at", DESCENDING)])
+
 
 def get_db() -> AsyncDatabase:
     return mongo.db

@@ -33,6 +33,9 @@ const HolidaysPage = lazy(() => import('./pages/scheduling/HolidaysPage'))
 const VoicebotPage = lazy(() => import('./pages/voice/VoicebotPage'))
 const CaseWorkspacePage = lazy(() => import('./pages/workspace/CaseWorkspacePage'))
 const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
+const BillingPage = lazy(() => import('./pages/billing/BillingPage'))
+const BillingSettingsPage = lazy(() => import('./pages/billing/BillingSettingsPage'))
+const PatientBillsPage = lazy(() => import('./pages/patient/PatientBillsPage'))
 const ClinicSettingsPage = lazy(() => import('./pages/admin/ClinicSettingsPage'))
 const SecurityPage = lazy(() => import('./pages/account/SecurityPage'))
 const StaffPage = lazy(() => import('./pages/admin/StaffPage'))
@@ -98,6 +101,8 @@ export default function App() {
           <Route path="holidays" element={<HolidaysPage />} />
           <Route path="settings/clinic" element={<ClinicSettingsPage />} />
           <Route path="staff" element={<StaffPage />} />
+          <Route path="billing" element={<BillingPage />} />
+          <Route path="billing/settings" element={<BillingSettingsPage />} />
           <Route path="audit" element={<AuditLogPage />} />
           <Route path="security" element={<SecurityPage />} />
           <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
@@ -124,6 +129,7 @@ export default function App() {
           {patientRoutes('patients')}
           {appointmentRoutes()}
           <Route path="queue" element={<QueuePage />} />
+          <Route path="billing" element={<BillingPage />} />
           <Route path="security" element={<SecurityPage />} />
         </Route>
       </Route>
@@ -136,6 +142,7 @@ export default function App() {
           <Route path="profiles/:patientId/edit" element={<EditPatientPage />} />
           {reportRoutes('profiles')}
           {appointmentRoutes()}
+          <Route path="bills" element={<PatientBillsPage />} />
         </Route>
       </Route>
 

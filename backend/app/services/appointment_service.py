@@ -76,13 +76,18 @@ async def get_for_user(db: AsyncDatabase, appointment_id: str, user: dict) -> di
 
 # --- visit type --------------------------------------------------------------
 
+# a partly paid visit was still charged, so it anchors the follow-up window
+PAID_STATUSES = [PaymentStatus.PAID.value, PaymentStatus.PARTIAL.value]
+
 
 async def compute_visit_type(
     db: AsyncDatabase, patient_id: str, doctor: dict, day: date, exclude: ObjectId | None = None
 ) -> dict:
     """New: no earlier completed visit with this doctor.
-    Follow-up: within the doctor's follow-up window of the last *paid* visit.
-    Returning: anything else."""
+    Follow-up: within the doctor's follow-up window of the last *paid* standard (new or returning) visit,
+    and, if the doctor limits them, fewer follow-ups since then than allowed.
+    Returning: anything else.
+    A paid follow-up doesn't restart the window; only a visit charged at the standard rate does."""
     prior: dict = {
         "patient_id": patient_id,
         "doctor_id": doctor["_id"],
@@ -92,11 +97,23 @@ async def compute_visit_type(
     if exclude:
         prior["_id"] = {"$ne": exclude}
     last = await db.appointments.find_one(prior, sort=[("date", -1)])
-    last_paid = await db.appointments.find_one({**prior, "payment_status": PaymentStatus.PAID.value}, sort=[("date", -1)])
+    last_paid = await db.appointments.find_one(
+        {**prior, "payment_status": {"$in": PAID_STATUSES}, "visit_type": {"$ne": VisitType.FOLLOW_UP.value}}, sort=[("date", -1)]
+    )
+    follow_ups_used = 0
+    if last_paid:
+        follow_ups_used = await db.appointments.count_documents(
+            {**prior, "visit_type": VisitType.FOLLOW_UP.value, "date": {"$gt": last_paid["date"], "$lte": day.isoformat()}}
+        )
+    allowed = doctor.get("free_follow_ups")
 
     if last is None:
         visit_type = VisitType.NEW
-    elif last_paid and (day - date.fromisoformat(last_paid["date"])).days <= doctor["follow_up_days"]:
+    elif (
+        last_paid
+        and (day - date.fromisoformat(last_paid["date"])).days <= doctor["follow_up_days"]
+        and (allowed is None or follow_ups_used < allowed)
+    ):
         visit_type = VisitType.FOLLOW_UP
     else:
         visit_type = VisitType.RETURNING
@@ -105,6 +122,8 @@ async def compute_visit_type(
         "last_visit_date": last and last["date"],
         "last_paid_visit_date": last_paid and last_paid["date"],
         "follow_up_days": doctor["follow_up_days"],
+        "follow_ups_used": follow_ups_used,
+        "free_follow_ups": allowed,
     }
 
 
@@ -329,12 +348,6 @@ async def clear_visit_type_override(db: AsyncDatabase, appt: dict) -> dict:
         {"_id": appt["_id"]},
         {"$set": {"visit_type": appt["visit_type_auto"], "visit_type_override": None}},
         return_document=ReturnDocument.AFTER,
-    )
-
-
-async def set_payment(db: AsyncDatabase, appt: dict, status: PaymentStatus) -> dict:
-    return await db.appointments.find_one_and_update(
-        {"_id": appt["_id"]}, {"$set": {"payment_status": status.value}}, return_document=ReturnDocument.AFTER
     )
 
 

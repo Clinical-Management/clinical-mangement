@@ -7,7 +7,6 @@ import {
   getAppointment,
   overrideVisitType,
   reschedule,
-  updatePayment,
   updateStatus,
 } from '../../api/appointments'
 import { StatusBadge, VisitTypeBadge } from '../../components/appointments/Badges'
@@ -16,6 +15,7 @@ import SlotPicker from '../../components/appointments/SlotPicker'
 import ClinicalNotesPanel from '../../components/clinical/ClinicalNotesPanel'
 import VitalsPanel from '../../components/clinical/VitalsPanel'
 import StartHistoryPanel from '../../components/history/StartHistoryPanel'
+import BillPanel from '../../components/billing/BillPanel'
 import PrescriptionVersions from '../../components/prescriptions/PrescriptionVersions'
 import { labelOf } from '../../components/patients/options'
 import {
@@ -263,20 +263,6 @@ export default function AppointmentDetailPage() {
                 Use detected type
               </button>
             )}
-            {isFrontDesk && (
-              <select
-                className={`${inputClass} w-auto!`}
-                value={appt.payment_status}
-                onChange={(e) => run(() => updatePayment(appt.id, e.target.value))}
-                title="Payment status"
-              >
-                {PAYMENT_STATUSES.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    Payment: {p.label}
-                  </option>
-                ))}
-              </select>
-            )}
           </div>
 
           {panel && (
@@ -331,6 +317,9 @@ export default function AppointmentDetailPage() {
 
       {/* clinical roles work with the prescription in the case workspace */}
       {!WORKSPACE_BASE[user.role] && <PrescriptionVersions appt={appt} canDeliver={!isOwner} />}
+
+      {/* the front desk bills here; doctors use the workspace's Billing tab */}
+      {isFrontDesk && !['cancelled', 'no_show'].includes(appt.status) && <BillPanel appt={appt} onChange={() => getAppointment(appt.id).then(setAppt)} />}
 
       <section className={cardClass}>
         <h2 className="mb-3 text-sm font-semibold text-slate-800">History</h2>

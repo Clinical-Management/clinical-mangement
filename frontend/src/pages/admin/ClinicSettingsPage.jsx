@@ -8,9 +8,11 @@ const FIELDS = [
   ['phone', 'Phone', '+91 20 1234 5678'],
   ['email', 'Email', 'care@clinic.example'],
   ['registration', 'Establishment registration', 'e.g. Clinical Establishments Act reg. no.'],
+  ['gstin', 'GSTIN (if registered)', '27ABCDE1234F1Z5'],
+  ['upi_id', 'UPI ID for patient payments', 'clinic@okhdfc'],
 ]
 
-/** Letterhead printed on every prescription PDF. */
+/** Letterhead printed on prescriptions and receipts, plus GSTIN and the UPI ID patients pay to. */
 export default function ClinicSettingsPage() {
   const [form, setForm] = useState(null)
   const [message, setMessage] = useState('')
@@ -38,7 +40,7 @@ export default function ClinicSettingsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <h1 className="text-2xl font-semibold text-slate-800">Clinic letterhead</h1>
+      <h1 className="text-2xl font-semibold text-slate-800">Clinic details</h1>
       {error && <p className={errorBox}>{error}</p>}
       {message && <p className="rounded-md bg-accent-50 px-4 py-3 text-sm text-accent-700">{message}</p>}
       <form onSubmit={save} className={`${cardClass} space-y-4`}>

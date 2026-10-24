@@ -6,6 +6,10 @@ from zoneinfo import ZoneInfo
 from app.core.config import settings
 
 
+def clinic_tz() -> ZoneInfo:
+    return ZoneInfo(settings.clinic_timezone)
+
+
 def clinic_now() -> datetime:
     return datetime.now(ZoneInfo(settings.clinic_timezone))
 

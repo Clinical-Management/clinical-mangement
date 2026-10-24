@@ -22,11 +22,14 @@ class WorkingBlock(BaseModel):
 
 
 class ConsultationFees(BaseModel):
-    """Consultation charge (INR) per visit type; None = not set yet. Billing auto-fills from these."""
+    """Consultation charge (whole rupees) per kind of visit; None = not set (the specialty's fee from the
+    billing settings applies). Billing auto-fills from these."""
 
     new: int | None = Field(None, ge=0, le=100_000)
     follow_up: int | None = Field(None, ge=0, le=100_000)
     returning: int | None = Field(None, ge=0, le=100_000)
+    emergency: int | None = Field(None, ge=0, le=100_000)  # emergency / after-hours
+    teleconsultation: int | None = Field(None, ge=0, le=100_000)
 
 
 class DoctorScheduleIn(BaseModel):
@@ -34,6 +37,9 @@ class DoctorScheduleIn(BaseModel):
     fees: ConsultationFees = Field(default_factory=ConsultationFees)
     slot_minutes: int = Field(15, ge=5, le=120)
     follow_up_days: int = Field(7, ge=0, le=365, description="Follow-up window after the last paid visit")
+    free_follow_ups: int | None = Field(
+        None, ge=0, le=20, description="Follow-up visits allowed at the follow-up fee within the window; None = no limit"
+    )
     weekly: list[WorkingBlock] = Field(default_factory=list, max_length=50)
 
     @model_validator(mode="after")

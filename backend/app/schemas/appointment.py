@@ -30,7 +30,10 @@ class Source(str, Enum):
 
 
 class PaymentStatus(str, Enum):
+    """Kept in step with the visit's bill by the billing service."""
+
     UNPAID = "unpaid"
+    PARTIAL = "partial"
     PAID = "paid"
     WAIVED = "waived"
 
@@ -71,10 +74,6 @@ class VisitTypeOverrideIn(BaseModel):
         if len(v) < 3:
             raise ValueError("A reason is required to override the visit type")
         return v
-
-
-class PaymentUpdate(BaseModel):
-    payment_status: PaymentStatus
 
 
 class VisitTypeOverrideOut(BaseModel):
@@ -135,3 +134,5 @@ class VisitTypePreview(BaseModel):
     last_visit_date: date | None
     last_paid_visit_date: date | None
     follow_up_days: int
+    follow_ups_used: int = 0
+    free_follow_ups: int | None = None

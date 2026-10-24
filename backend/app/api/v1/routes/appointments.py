@@ -10,7 +10,6 @@ from app.schemas.appointment import (
     AppointmentOut,
     AppointmentStatus,
     CancelIn,
-    PaymentUpdate,
     RescheduleIn,
     StatusUpdate,
     VisitTypeOverrideIn,
@@ -123,9 +122,3 @@ async def override_visit_type(appointment_id: str, body: VisitTypeOverrideIn, db
 async def clear_visit_type_override(appointment_id: str, db: DB, user: CurrentUser):
     """Go back to the auto-detected visit type."""
     return await svc.clear_visit_type_override(db, await svc.get_for_user(db, appointment_id, user))
-
-
-@router.put("/{appointment_id}/payment", response_model=AppointmentOut, dependencies=[FrontDesk])
-async def update_payment(appointment_id: str, body: PaymentUpdate, db: DB, user: CurrentUser):
-    """Paid visits anchor the follow-up window (until a billing module replaces this)."""
-    return await svc.set_payment(db, await svc.get_for_user(db, appointment_id, user), body.payment_status)

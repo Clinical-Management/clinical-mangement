@@ -75,5 +75,14 @@ async def ensure_indexes() -> None:
     await audit.create_index([("at", DESCENDING)])
 
 
+    await mongo.db.bills.create_index([("patient_id", ASCENDING), ("date", DESCENDING)])
+    await mongo.db.bills.create_index([("status", ASCENDING), ("balance", ASCENDING)])
+    await mongo.db.receipts.create_index([("number", ASCENDING)], unique=True)
+    await mongo.db.receipts.create_index([("issued_at", ASCENDING)])
+    await mongo.db.receipts.create_index([("appointment_id", ASCENDING)])
+    await mongo.db.receipts.create_index([("patient_id", ASCENDING)])
+    await mongo.db.share_links.create_index([("kind", ASCENDING), ("ref_id", ASCENDING), ("token_hash", ASCENDING)])
+    await mongo.db.reconciliations.create_index([("date", ASCENDING), ("at", DESCENDING)])
+
 def get_db() -> AsyncDatabase:
     return mongo.db

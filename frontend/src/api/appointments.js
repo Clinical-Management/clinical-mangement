@@ -27,5 +27,3 @@ export const overrideVisitType = (id, payload) =>
 
 export const clearVisitTypeOverride = (id) => api.delete(`/appointments/${id}/visit-type`).then((r) => r.data)
 
-export const updatePayment = (id, payment_status) =>
-  api.put(`/appointments/${id}/payment`, { payment_status }).then((r) => r.data)

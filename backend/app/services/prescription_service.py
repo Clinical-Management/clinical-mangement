@@ -7,12 +7,8 @@ verifiable (the QR on an old PDF reports that it has been superseded).
 import asyncio
 import hashlib
 import logging
-import re
 import secrets
-import smtplib
 from datetime import date, datetime, timedelta, timezone
-from email.message import EmailMessage
-from urllib.parse import quote
 
 from bson import ObjectId
 from gridfs import AsyncGridFSBucket
@@ -25,7 +21,7 @@ from app.core.errors import Conflict, Forbidden, Invalid, NotFound
 from app.prescribing import checks as rx_checks, pdf as rx_pdf, signing, translate as tr
 from app.schemas.common import parse_object_id
 from app.schemas.prescription import FinalizeIn, PrescriptionIn
-from app.services import case_summary_service, patient_service, scheduling_service
+from app.services import case_summary_service, messaging, patient_service, scheduling_service
 
 log = logging.getLogger(__name__)
 
@@ -109,7 +105,7 @@ async def save(db: AsyncDatabase, appt: dict, data: PrescriptionIn, actor: dict)
 
 async def clinic_settings(db: AsyncDatabase) -> dict:
     doc = await db.settings.find_one({"_id": "clinic"}) or {}
-    return {"name": doc.get("name") or "Clinical Management", **{k: doc.get(k) for k in ("address", "phone", "email", "registration")}}
+    return {"name": doc.get("name") or "Clinical Management", **{k: doc.get(k) for k in ("address", "phone", "email", "registration", "gstin", "upi_id")}}
 
 
 async def _letterhead(db: AsyncDatabase, appt: dict) -> dict:
@@ -287,25 +283,6 @@ async def version_for_link(db: AsyncDatabase, public_id: str, token: str) -> dic
     return v
 
 
-def _smtp_send(to: str, subject: str, text: str, pdf: bytes, filename: str) -> None:
-    msg = EmailMessage()
-    msg["From"] = settings.smtp_from or settings.smtp_username
-    msg["To"] = to
-    msg["Subject"] = subject
-    msg.set_content(text)
-    msg.add_attachment(pdf, maintype="application", subtype="pdf", filename=filename)
-    with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=20) as smtp:
-        smtp.starttls()
-        if settings.smtp_username:
-            smtp.login(settings.smtp_username, settings.smtp_password or "")
-        smtp.send_message(msg)
-
-
-def _phone_digits(phone: str) -> str:
-    digits = re.sub(r"\D", "", phone)
-    return "91" + digits if len(digits) == 10 else digits  # Indian mobile without country code
-
-
 async def deliver(db: AsyncDatabase, version: dict, *, channel: str, to: str | None, lang: str, actor: dict) -> dict:
     """Print / WhatsApp / SMS / email / patient app. WhatsApp and SMS open on this device with a secure
     link (no messaging provider is configured); email is sent with the PDF when SMTP is set up."""
@@ -329,8 +306,7 @@ async def deliver(db: AsyncDatabase, version: dict, *, channel: str, to: str | N
             phone = to or patient["phone"]
             record["to"] = phone
             record["share_url"] = (
-                f"https://wa.me/{_phone_digits(phone)}?text={quote(message)}" if channel == "whatsapp"
-                else f"sms:{_phone_digits(phone)}?body={quote(message)}"
+                messaging.whatsapp_url(phone, message) if channel == "whatsapp" else messaging.sms_url(phone, message)
             )
             record.update(status="link_ready", detail="Opens on this device to send")
         else:  # email
@@ -338,16 +314,16 @@ async def deliver(db: AsyncDatabase, version: dict, *, channel: str, to: str | N
             if not email:
                 raise Invalid("No email address for this patient")
             record["to"] = email
-            if settings.smtp_host:
+            if messaging.smtp_configured():
                 try:
                     data = await render_pdf(db, version, lang=lang, copy="patient")
-                    await asyncio.to_thread(_smtp_send, email, f"Your prescription - {clinic}", message, data, f"{version['public_id']}.pdf")
+                    await asyncio.to_thread(messaging.smtp_send, email, f"Your prescription - {clinic}", message, [(data, f"{version['public_id']}.pdf")])
                     record.update(status="sent", detail="Emailed with the PDF attached")
                 except Exception as exc:  # SMTP errors vary widely
                     log.warning("Prescription email failed: %s", exc)
                     record.update(status="failed", detail="Email could not be sent; try again or share the link")
             else:
-                record["share_url"] = f"mailto:{email}?subject={quote('Your prescription - ' + clinic)}&body={quote(message)}"
+                record["share_url"] = messaging.mailto_url(email, f"Your prescription - {clinic}", message)
                 record.update(status="link_ready", detail="Email server not configured: opens your mail app with the link")
     await db.rx_deliveries.insert_one(record)
     return record

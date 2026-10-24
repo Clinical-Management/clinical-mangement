@@ -67,38 +67,6 @@ def test_notes_autosave_coalesces_change_log(client, clinic):
 # --- billing -----------------------------------------------------------------
 
 
-def test_bill_autofills_from_visit_type_and_tracks_changes(client, clinic):
-    set_fees(client, clinic)
-    appt = book(client, clinic).json()["id"]
-    url = f"{APPT}/{appt}/bill"
-
-    bill = client.get(url, headers=clinic["desk"]).json()
-    assert bill["visit_type"] == "new" and bill["total"] == 600 and bill["items"][0]["auto"] and not bill["fee_missing"]
-
-    # visit type overridden to follow-up -> untouched auto line follows
-    client.put(f"{APPT}/{appt}/visit-type", json={"visit_type": "follow_up", "reason": "Same complaint as last week"}, headers=clinic["desk"])
-    assert client.get(url, headers=clinic["desk"]).json()["total"] == 0
-
-    # add a procedure, discount, then pay
-    items = client.get(url, headers=clinic["desk"]).json()["items"]
-    bill = client.put(url, json={"items": items + [{"description": "Dressing", "amount": 150, "kind": "procedure"}], "discount": 50}, headers=clinic["desk"]).json()
-    assert bill["subtotal"] == 150 and bill["total"] == 100
-    assert client.put(url, json={"items": bill["items"], "discount": 500}, headers=clinic["desk"]).status_code == 422
-
-    paid = client.post(f"{url}/pay", json={"mode": "upi"}, headers=clinic["desk"]).json()
-    assert paid["payment_status"] == "paid" and paid["payment_mode"] == "upi"
-    assert client.get(f"{APPT}/{appt}", headers=clinic["desk"]).json()["payment_status"] == "paid"
-    assert client.put(url, json={"items": [], "discount": 0}, headers=clinic["desk"]).status_code == 409
-
-
-def test_bill_warns_when_fee_not_set_and_can_be_waived(client, clinic):
-    appt = book(client, clinic).json()["id"]
-    bill = client.get(f"{APPT}/{appt}/bill", headers=clinic["doctor"]).json()
-    assert bill["fee_missing"] and bill["total"] == 0
-    r = client.post(f"{APPT}/{appt}/bill/waive", json={"reason": "Staff family"}, headers=clinic["admin"])
-    assert r.json()["payment_status"] == "waived" and r.json()["waive_reason"] == "Staff family"
-
-
 # --- past visits & reports ---------------------------------------------------
 
 

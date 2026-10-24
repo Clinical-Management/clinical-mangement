@@ -89,7 +89,7 @@ async def _patient_for(db: AsyncDatabase, resource: str, resource_id: str) -> st
     oid = parse_object_id(resource_id)
     if not oid:
         return None
-    collection = {"appointments": "appointments", "reports": "reports", "history": "history_sessions", "bills": "bills"}.get(resource)
+    collection = {"appointments": "appointments", "reports": "reports", "history": "history_sessions", "bills": "bills", "receipts": "receipts"}.get(resource)
     if collection:
         doc = await db[collection].find_one({"_id": oid}, {"patient_id": 1})
         return doc and doc.get("patient_id")

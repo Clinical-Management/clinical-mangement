@@ -64,7 +64,16 @@ def complete_visit(client, c, appt_id, paid=True):
     for s in ("in_consultation", "completed"):
         assert client.post(f"{API}/{appt_id}/status", json={"status": s}, headers=c["doctor"]).status_code == 200
     if paid:
-        client.put(f"{API}/{appt_id}/payment", json={"payment_status": "paid"}, headers=c["desk"])
+        pay_visit(client, c, appt_id)
+
+
+def pay_visit(client, c, appt_id, amount=50000):
+    """Pays the visit in full through its bill (a custom fee if the doctor has none set)."""
+    bill = client.get(f"{API}/{appt_id}/bill", headers=c["desk"]).json()
+    if bill["fee_missing"]:
+        bill = client.put(f"{API}/{appt_id}/bill", json={"fee": {"basis": "custom", "amount": amount, "reason": "test fee"}}, headers=c["desk"]).json()
+    r = client.post(f"{API}/{appt_id}/bill/payments", json={"mode": "cash", "amount": bill["balance"]}, headers=c["desk"])
+    assert r.status_code == 200, r.text
 
 
 # --- availability ------------------------------------------------------------

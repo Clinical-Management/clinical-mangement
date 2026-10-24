@@ -18,6 +18,7 @@ export const VISIT_TYPES = [
 
 export const PAYMENT_STATUSES = [
   { value: 'unpaid', label: 'Unpaid' },
+  { value: 'partial', label: 'Part paid' },
   { value: 'paid', label: 'Paid' },
   { value: 'waived', label: 'Waived' },
 ]

@@ -28,7 +28,8 @@ export default function DoctorSchedulePage() {
           specialization: d.specialization ?? '',
           slot_minutes: d.slot_minutes,
           follow_up_days: d.follow_up_days,
-          fees: { new: d.fees?.new ?? '', follow_up: d.fees?.follow_up ?? '', returning: d.fees?.returning ?? '' },
+          free_follow_ups: d.free_follow_ups ?? '',
+          fees: Object.fromEntries(['new', 'follow_up', 'returning', 'emergency', 'teleconsultation'].map((k) => [k, d.fees?.[k] ?? ''])),
           weekly: d.weekly,
         })
       })
@@ -45,6 +46,7 @@ export default function DoctorSchedulePage() {
         specialization: form.specialization || null,
         slot_minutes: Number(form.slot_minutes),
         follow_up_days: Number(form.follow_up_days),
+        free_follow_ups: form.free_follow_ups === '' ? null : Number(form.free_follow_ups),
         fees: Object.fromEntries(Object.entries(form.fees).map(([k, v]) => [k, v === '' ? null : Number(v)])),
       })
       setDoctor(saved)
@@ -93,16 +95,22 @@ export default function DoctorSchedulePage() {
             <span className={labelClass}>Follow-up window (days after a paid visit)</span>
             {number('follow_up_days', { min: 0, max: 365 })}
           </label>
+          <label>
+            <span className={labelClass}>Follow-ups allowed in the window (blank = no limit)</span>
+            {number('free_follow_ups', { min: 0, max: 20, required: false, placeholder: 'No limit' })}
+          </label>
         </div>
 
         <div>
           <h2 className="mb-1 text-sm font-semibold text-slate-800">Consultation fees (₹)</h2>
-          <p className="mb-2 text-xs text-slate-500">Billing fills these in automatically from the visit type.</p>
+          <p className="mb-2 text-xs text-slate-500">Billing fills these in automatically from the visit type. Left blank, the specialty&apos;s fee from the billing settings applies.</p>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               ['new', 'New visit'],
               ['follow_up', 'Follow-up (within window)'],
               ['returning', 'Returning'],
+              ['emergency', 'Emergency / after-hours'],
+              ['teleconsultation', 'Teleconsultation'],
             ].map(([key, label]) => (
               <label key={key}>
                 <span className={labelClass}>{label}</span>

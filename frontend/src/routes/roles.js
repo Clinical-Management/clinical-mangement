@@ -33,11 +33,13 @@ export const ROLE_NAV = {
     { to: '/admin/queue', label: 'Live queue' },
     { to: '/admin/appointments', label: 'Appointments' },
     { to: '/admin/patients', label: 'Patients' },
+    { to: '/admin/billing', label: 'Billing', end: true },
     { to: '/admin/doctors', label: 'Doctors' },
     { to: '/admin/holidays', label: 'Holidays' },
     { to: '/admin/staff', label: 'Staff' },
     { to: '/admin/audit', label: 'Audit log' },
-    { to: '/admin/settings/clinic', label: 'Clinic letterhead' },
+    { to: '/admin/billing/settings', label: 'Fees & price list' },
+    { to: '/admin/settings/clinic', label: 'Clinic details' },
   ],
   doctor: [
     { to: '/doctor', label: 'Dashboard', end: true },
@@ -51,9 +53,11 @@ export const ROLE_NAV = {
     { to: '/reception/queue', label: 'Live queue' },
     { to: '/reception/appointments', label: 'Appointments' },
     { to: '/reception/patients', label: 'Patients' },
+    { to: '/reception/billing', label: 'Billing' },
   ],
   patient: [
     { to: '/patient', label: 'My profiles', end: true },
     { to: '/patient/appointments', label: 'Appointments' },
+    { to: '/patient/bills', label: 'Bills' },
   ],
 }

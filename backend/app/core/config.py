@@ -51,12 +51,27 @@ class Settings(BaseSettings):
     # used in QR codes and patient links, and optional SMTP for emailing PDFs
     prescription_signing_key: str | None = None
     frontend_url: str = "http://localhost:5173"
+    # Public address of this API (receipt links point straight at the PDF)
+    api_public_url: str = "http://localhost:8000"
     patient_link_days: int = 30
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
     smtp_password: str | None = None
     smtp_from: str | None = None
+
+    # Notifications. Without a provider, WhatsApp/SMS messages are recorded as "not configured" and staff
+    # can still share links from their own phone. WhatsApp uses the Cloud API with an approved template
+    # that has one body variable; SMS uses Twilio.
+    whatsapp_token: str | None = None
+    whatsapp_phone_number_id: str | None = None
+    whatsapp_template: str = "clinic_message"
+    twilio_account_sid: str | None = None
+    twilio_auth_token: str | None = None
+    twilio_from: str | None = None
+    # Background sender for reminders and scheduled messages (off in tests, which call it directly)
+    notifications_worker: bool = True
+    notifications_interval_seconds: int = 30
 
     # Report uploads (stored in MongoDB GridFS)
     report_max_mb: int = 25

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import DashboardLayout from './layouts/DashboardLayout'
 import Login from './pages/auth/Login'
+import Landing from './pages/Landing'
 import Register from './pages/auth/Register'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './routes/ProtectedRoute'
@@ -38,7 +39,7 @@ const VerifyPrescriptionPage = lazy(() => import('./pages/public/VerifyPrescript
 function HomeRedirect() {
   const { user, loading } = useAuth()
   if (loading) return null
-  return <Navigate to={user ? ROLE_HOME[user.role] : '/login'} replace />
+  return user ? <Navigate to={ROLE_HOME[user.role]} replace /> : <Landing />
 }
 
 // Patient record pages for staff roles

@@ -83,6 +83,13 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
+    @property
+    def cors_origin_regex(self) -> str | None:
+        """Outside production, the dev frontend on any local port (Vite moves to 5174... when 5173 is busy)."""
+        if self.app_env.lower() in {"production", "prod"}:
+            return None
+        return r"http://(localhost|127\.0\.0\.1)(:\d+)?"
+
 
 @lru_cache
 def get_settings() -> Settings:

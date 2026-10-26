@@ -62,6 +62,26 @@ python -m scripts.create_admin admin@clinic.com "Admin" StrongPass123
 uvicorn app.main:app --reload   # http://localhost:8000/docs
 ```
 
+To populate a non-production database with synthetic demo data, run this instead of creating the first admin:
+
+```bash
+python -m scripts.seed_demo                 # add --no-staff-mfa to let demo staff sign in with a password only
+```
+
+All demo accounts use `DemoPass123!`:
+
+| Role | Email | Name |
+| --- | --- | --- |
+| Admin | `admin@demo.clinic` | Demo Admin |
+| Doctor (General Medicine) | `doctor@demo.clinic` | Dr. Asha Rao |
+| Doctor (Paediatrics) | `pediatrician@demo.clinic` | Dr. Vikram Iyer |
+| Receptionist | `receptionist@demo.clinic` | Neha Kulkarni |
+| Patient | `patient@demo.clinic` | Priya Deshmukh (manages her son Aarav and father Suresh) |
+
+The script also sets up the clinic letterhead (only if none is saved yet), both doctors' hours, fees and registration details, a holiday and a doctor's leave, nine patients, and about three months of visits run through the normal flow: vitals, examination notes, ICD-10 diagnoses, finalized prescriptions, bills with receipts (one part-paid, one due), a no-show and a cancellation. Today gets a live queue (waiting, in consultation, completed, booked for the evening), and there are upcoming bookings, automatically booked follow-ups and medicine reminders. Demo patients receive messages in the app inbox only.
+
+Each run rebuilds the demo visits, so rerun it on the morning of a demo to get a fresh queue for that day. It resets the demo accounts to the listed password and clears their login lockouts; it refuses to overwrite accounts it did not create and will not run when `APP_ENV` is `production` or `prod`. Without `--no-staff-mfa`, staff accounts may be asked to set up an authenticator app on first sign-in. It adds only synthetic sample information; do not use these credentials for a real clinic.
+
 **Frontend**
 
 ```bash

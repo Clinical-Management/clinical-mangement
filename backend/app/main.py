@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -13,7 +14,7 @@ from app.core.errors import DomainError
 from app.core.security import decode_access_token
 from app.history.engine import EngineError
 from app.db.mongodb import close_mongo_connection, connect_to_mongo, mongo
-from app.services import audit_service
+from app.services import audit_service, notify_service
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +22,10 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await connect_to_mongo()
+    worker = asyncio.create_task(notify_service.run_worker(lambda: mongo.db)) if settings.notifications_worker else None
     yield
+    if worker:
+        worker.cancel()
     await close_mongo_connection()
 
 

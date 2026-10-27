@@ -59,7 +59,7 @@ export default function BookAppointmentPage() {
 
   const [mode, setMode] = useState(isFrontDesk && params.get('mode') === 'walk-in' ? 'walk-in' : 'slot')
   const [patient, setPatient] = useState(null)
-  const [doctorId, setDoctorId] = useState('')
+  const [doctorId, setDoctorId] = useState(() => params.get('doctor_id') ?? '') // e.g. from the follow-up callback list
   const [date, setDate] = useState(todayISO())
   const [slot, setSlot] = useState('')
   const [slotsVersion, setSlotsVersion] = useState(0) // bump to reload the slot grid

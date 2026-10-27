@@ -36,6 +36,9 @@ const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
 const BillingPage = lazy(() => import('./pages/billing/BillingPage'))
 const BillingSettingsPage = lazy(() => import('./pages/billing/BillingSettingsPage'))
 const PatientBillsPage = lazy(() => import('./pages/patient/PatientBillsPage'))
+const PatientInboxPage = lazy(() => import('./pages/patient/PatientInboxPage'))
+const ManageAppointmentPage = lazy(() => import('./pages/public/ManageAppointmentPage'))
+const RemindersPage = lazy(() => import('./pages/reminders/RemindersPage'))
 const ClinicSettingsPage = lazy(() => import('./pages/admin/ClinicSettingsPage'))
 const SecurityPage = lazy(() => import('./pages/account/SecurityPage'))
 const StaffPage = lazy(() => import('./pages/admin/StaffPage'))
@@ -89,6 +92,7 @@ export default function App() {
       {/* Prescriptions without login: QR verification and the patient's delivery link */}
       <Route path="/verify/:publicId" element={<VerifyPrescriptionPage />} />
       <Route path="/rx/:publicId" element={<PatientPrescriptionPage />} />
+      <Route path="/a/:appointmentId" element={<ManageAppointmentPage />} />
 
       <Route element={<ProtectedRoute roles={[ROLES.ADMIN]} />}>
         <Route path="/admin" element={<DashboardLayout />}>
@@ -103,6 +107,7 @@ export default function App() {
           <Route path="staff" element={<StaffPage />} />
           <Route path="billing" element={<BillingPage />} />
           <Route path="billing/settings" element={<BillingSettingsPage />} />
+          <Route path="reminders" element={<RemindersPage />} />
           <Route path="audit" element={<AuditLogPage />} />
           <Route path="security" element={<SecurityPage />} />
           <Route path="visits/:appointmentId" element={<CaseWorkspacePage />} />
@@ -130,6 +135,7 @@ export default function App() {
           {appointmentRoutes()}
           <Route path="queue" element={<QueuePage />} />
           <Route path="billing" element={<BillingPage />} />
+          <Route path="reminders" element={<RemindersPage />} />
           <Route path="security" element={<SecurityPage />} />
         </Route>
       </Route>
@@ -143,6 +149,7 @@ export default function App() {
           {reportRoutes('profiles')}
           {appointmentRoutes()}
           <Route path="bills" element={<PatientBillsPage />} />
+          <Route path="messages" element={<PatientInboxPage />} />
         </Route>
       </Route>
 

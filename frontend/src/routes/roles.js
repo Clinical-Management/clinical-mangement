@@ -34,6 +34,7 @@ export const ROLE_NAV = {
     { to: '/admin/appointments', label: 'Appointments' },
     { to: '/admin/patients', label: 'Patients' },
     { to: '/admin/billing', label: 'Billing', end: true },
+    { to: '/admin/reminders', label: 'Follow-ups & reminders' },
     { to: '/admin/doctors', label: 'Doctors' },
     { to: '/admin/holidays', label: 'Holidays' },
     { to: '/admin/staff', label: 'Staff' },
@@ -54,10 +55,12 @@ export const ROLE_NAV = {
     { to: '/reception/appointments', label: 'Appointments' },
     { to: '/reception/patients', label: 'Patients' },
     { to: '/reception/billing', label: 'Billing' },
+    { to: '/reception/reminders', label: 'Follow-ups & reminders' },
   ],
   patient: [
     { to: '/patient', label: 'My profiles', end: true },
     { to: '/patient/appointments', label: 'Appointments' },
     { to: '/patient/bills', label: 'Bills' },
+    { to: '/patient/messages', label: 'Messages' },
   ],
 }

@@ -167,7 +167,12 @@ async def finalize(db: AsyncDatabase, appt: dict, body: FinalizeIn, actor: dict)
         {"appointment_id": appt["_id"], "_id": {"$ne": version["_id"]}, "superseded_by": None},
         {"$set": {"superseded_by": version["_id"], "superseded_at": _now()}},
     )
-    await db.prescriptions.update_one({"appointment_id": appt["_id"]}, {"$set": {"status": "final", "current_version": number}})
+    await db.prescriptions.update_one({"appointment_id": appt["_id"]}, {"$set": {"status": "final", "current_version": number, "nudged_at": None}})
+    # the advised follow-up goes straight into the calendar (nearest free slot on or after the date)
+    from app.services import reminder_service
+
+    follow = content.get("follow_up") or {}
+    await reminder_service.sync_follow_up(db, appt, date.fromisoformat(str(follow["date"])[:10]) if follow.get("date") else None, actor)
     return version
 
 

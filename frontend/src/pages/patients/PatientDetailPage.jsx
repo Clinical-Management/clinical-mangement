@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getFamily, getPatient } from '../../api/patients'
+import CommunicationPanel from '../../components/patients/CommunicationPanel'
 import ConsentPanel from '../../components/patients/ConsentPanel'
 import MedicalInfoPanel from '../../components/patients/MedicalInfoPanel'
 import { BLOOD_GROUPS, GENDERS, labelOf, RELATIONSHIPS } from '../../components/patients/options'
@@ -120,6 +121,7 @@ export default function PatientDetailPage() {
         <div className="space-y-5">
           {/* key: reset the draft when consent is saved elsewhere */}
           <ConsentPanel key={patient.consent.updated_at} patient={patient} onUpdated={setPatient} />
+          <CommunicationPanel patient={patient} editable={user.role !== ROLES.DOCTOR} />
 
           <section className={cardClass}>
             <h2 className="mb-3 text-sm font-semibold text-slate-800">Family</h2>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { deliverVersion, listDeliveries, listVersions } from '../../api/prescriptions'
 import { cardClass, errorMessage, formatDate, formatTime, inputClass, primaryButton, secondaryButton } from '../ui'
 import { LANGS, openPdf } from './options'
+import PatientReminders from './PatientReminders'
 
 const CHANNELS = [
   ['print', 'Print'],
@@ -88,6 +89,8 @@ export default function PrescriptionVersions({ appt, refreshKey, canDeliver = tr
               Patient copy (PDF)
             </button>
           </div>
+
+          {!canDeliver && <PatientReminders key={version.id} version={version} />}
 
           {canDeliver && (
             <div className="space-y-2 rounded-lg bg-slate-50 p-3">

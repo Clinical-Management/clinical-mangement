@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime
 from enum import Enum
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BaseModel, EmailStr, Field, field_validator, model_validator
 
@@ -110,6 +110,14 @@ class ConsentIn(BaseModel):
         return v
 
 
+class Communication(BaseModel):
+    """How the patient wants to hear from the clinic (reminders, receipts, prescriptions)."""
+
+    language: Literal["en", "hi", "mr"] = "en"
+    channels: list[Literal["whatsapp", "sms", "email", "app"]] = Field(default_factory=lambda: ["whatsapp", "app"], max_length=4)
+    reminders: bool = True  # appointment reminders and follow-up nudges
+
+
 class PatientDemographics(BaseModel):
     full_name: ShortText
     date_of_birth: date | None = None
@@ -121,6 +129,7 @@ class PatientDemographics(BaseModel):
     emergency_contact: EmergencyContact | None = None
     blood_group: BloodGroup = BloodGroup.UNKNOWN
     relationship: Relationship | None = None
+    communication: Communication | None = None  # left out: keep the patient's current choices
 
     @field_validator("full_name")
     @classmethod
@@ -162,6 +171,7 @@ class PatientOut(BaseModel):
     emergency_contact: EmergencyContact | None
     blood_group: BloodGroup
     relationship: Relationship | None
+    communication: Communication = Field(default_factory=Communication)
     managed_by: PyObjectId | None
     consent: ConsentOut
     voicebot_allowed: bool

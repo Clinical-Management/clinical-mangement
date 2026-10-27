@@ -85,6 +85,7 @@ class VersionOut(BaseModel):
     finalized_by_role: str
     superseded: bool
     letterhead: dict
+    medicine_reminders: dict | None = None  # {"on": bool, "count": int} when the patient opted in
 
 
 class DeliveryIn(BaseModel):

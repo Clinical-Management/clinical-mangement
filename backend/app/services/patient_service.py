@@ -5,7 +5,7 @@ from bson import ObjectId
 from pymongo import ReturnDocument
 from pymongo.asynchronous.database import AsyncDatabase
 
-from app.schemas.patient import ConsentIn, MedicalInfo, PatientCreate, PatientDemographics
+from app.schemas.patient import Communication, ConsentIn, MedicalInfo, PatientCreate, PatientDemographics
 
 
 class DuplicatePatient(Exception):
@@ -71,6 +71,8 @@ def _demographic_fields(data: PatientDemographics, now: datetime) -> dict:
     # DOB wins over age; when only age is known, remember when it was stated
     fields["stated_age"] = None if data.date_of_birth else data.age
     fields["stated_age_at"] = None if data.date_of_birth else now
+    if fields.get("communication") is None:
+        fields.pop("communication", None)
     return fields
 
 
@@ -109,6 +111,7 @@ async def create_patient(db: AsyncDatabase, data: PatientCreate, *, actor: dict,
         "consent": consent,
         "consent_history": [consent],
         "medical": MedicalInfo().model_dump(),
+        "communication": (data.communication or Communication()).model_dump(),
         # Kept so admins can review records registered despite a duplicate warning
         "possible_duplicates": [m["patient_id"] for m in matches],
         "created_at": now,

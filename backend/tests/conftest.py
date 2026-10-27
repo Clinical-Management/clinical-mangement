@@ -5,6 +5,8 @@ from datetime import datetime
 os.environ["MONGODB_DB"] = "clinical_management_test"
 # Staff MFA is covered by its own tests; elsewhere staff sign in with a password only
 os.environ["STAFF_MFA_REQUIRED"] = "false"
+# Tests run the reminder/notification sender explicitly
+os.environ["NOTIFICATIONS_WORKER"] = "false"
 
 import pytest
 from fastapi.testclient import TestClient

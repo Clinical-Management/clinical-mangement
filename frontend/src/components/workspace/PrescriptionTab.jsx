@@ -10,6 +10,7 @@ import {
   listTemplates,
   saveTemplate,
 } from '../../api/prescriptions'
+import { getFollowUp } from '../../api/reminders'
 import { getPrescription, savePrescription } from '../../api/workspace'
 import { useAuth } from '../../context/AuthContext'
 import useAutosave from '../../hooks/useAutosave'
@@ -120,6 +121,7 @@ export default function PrescriptionTab({ appt, notes, onNotesSaved, active = tr
   const [templates, setTemplates] = useState([])
   const [finalizing, setFinalizing] = useState(false)
   const [versionsKey, setVersionsKey] = useState(0)
+  const [followUp, setFollowUp] = useState(null) // booked automatically when finalized
   const [error, setError] = useState('')
   const [outcome, setOutcome] = useState({ status: notes.outcome?.status ?? '', note: notes.outcome?.note ?? '' })
 
@@ -135,6 +137,10 @@ export default function PrescriptionTab({ appt, notes, onNotesSaved, active = tr
   useEffect(() => {
     if (active) getCaseSummary(appt.id).then(setCaseSummary).catch(() => setCaseSummary(null))
   }, [appt.id, active])
+
+  useEffect(() => {
+    getFollowUp(appt.id).then(setFollowUp).catch(() => {})
+  }, [appt.id, versionsKey])
 
   useEffect(() => {
     getPrescription(appt.id).then((p) => {
@@ -322,10 +328,19 @@ export default function PrescriptionTab({ appt, notes, onNotesSaved, active = tr
               <input className={inputClass} placeholder="e.g. Review with reports" value={rx.follow_up.note} onChange={(e) => setRx({ ...rx, follow_up: { ...rx.follow_up, note: e.target.value } })} />
             </label>
           </div>
-          {server.follow_up?.date && (
-            <Link to={`${APPOINTMENT_BASE[user.role]}/new?patient_id=${appt.patient_id}`} className="mt-2 inline-block text-sm text-brand-600 hover:underline">
-              Book the follow-up ({formatDate(server.follow_up.date)})
-            </Link>
+          {followUp && followUp.status === 'scheduled' ? (
+            <p className="mt-2 rounded-md bg-accent-50 px-3 py-2 text-sm text-accent-700">
+              Follow-up booked for {formatDate(followUp.date)} at {followUp.start_time}.{' '}
+              <Link to={`${APPOINTMENT_BASE[user.role]}/${followUp.id}`} className="underline">
+                Open
+              </Link>
+            </p>
+          ) : (
+            server.follow_up?.date && (
+              <p className="mt-2 text-xs text-slate-500">
+                Finalizing books the nearest free slot on or after {formatDate(server.follow_up.date)} and reminds the patient.
+              </p>
+            )
           )}
         </section>
       </div>

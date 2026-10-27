@@ -23,7 +23,7 @@ export const PAYMENT_STATUSES = [
   { value: 'waived', label: 'Waived' },
 ]
 
-export const SOURCES = { online: 'Online', front_desk: 'Front desk', walk_in: 'Walk-in' }
+export const SOURCES = { online: 'Online', front_desk: 'Front desk', walk_in: 'Walk-in', follow_up: 'Follow-up (auto-booked)' }
 
 export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 

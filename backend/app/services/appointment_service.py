@@ -178,13 +178,13 @@ async def _new_appointment(db, *, patient: dict, doctor: dict, day: date, actor:
     }
 
 
-async def book(db: AsyncDatabase, data: AppointmentCreate, actor: dict) -> dict:
+async def book(db: AsyncDatabase, data: AppointmentCreate, actor: dict, source: Source | None = None) -> dict:
     patient = await _patient_for(db, data.patient_id, actor)
     doctor = await scheduling_service.get_doctor(db, data.doctor_id)
     end = await scheduling_service.validate_slot(db, doctor, data.date, data.start_time)
     await _ensure_no_same_day_booking(db, patient["patient_id"], doctor["_id"], data.date)
 
-    source = Source.ONLINE if actor["role"] == "patient" else Source.FRONT_DESK
+    source = source or (Source.ONLINE if actor["role"] == "patient" else Source.FRONT_DESK)
     doc = await _new_appointment(db, patient=patient, doctor=doctor, day=data.date, actor=actor, source=source)
     doc.update(
         start_time=data.start_time,

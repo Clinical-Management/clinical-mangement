@@ -84,5 +84,14 @@ async def ensure_indexes() -> None:
     await mongo.db.share_links.create_index([("kind", ASCENDING), ("ref_id", ASCENDING), ("token_hash", ASCENDING)])
     await mongo.db.reconciliations.create_index([("date", ASCENDING), ("at", DESCENDING)])
 
+    notifications = mongo.db.notifications
+    await notifications.create_index([("status", ASCENDING), ("scheduled_at", ASCENDING)])
+    await notifications.create_index([("patient_id", ASCENDING), ("scheduled_at", DESCENDING)])
+    await notifications.create_index([("channel", ASCENDING), ("to", ASCENDING), ("sent_at", DESCENDING)])
+    await notifications.create_index([("batch", ASCENDING)])
+    await mongo.db.appointments.create_index([("follow_up_of", ASCENDING)], sparse=True)
+    await mongo.db.prescriptions.create_index([("status", ASCENDING), ("follow_up.date", ASCENDING)])
+    await mongo.db.callbacks.create_index([("appointment_id", ASCENDING), ("at", DESCENDING)])
+
 def get_db() -> AsyncDatabase:
     return mongo.db

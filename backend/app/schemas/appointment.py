@@ -27,6 +27,7 @@ class Source(str, Enum):
     ONLINE = "online"
     FRONT_DESK = "front_desk"
     WALK_IN = "walk_in"
+    FOLLOW_UP = "follow_up"  # booked automatically from the doctor's follow-up advice
 
 
 class PaymentStatus(str, Enum):
@@ -118,6 +119,8 @@ class AppointmentOut(BaseModel):
     visit_type_override: VisitTypeOverrideOut | None
     payment_status: PaymentStatus
     cancel_reason: str | None = None
+    confirmed_at: datetime | None = None  # the patient confirmed from a reminder
+    follow_up_of: PyObjectId | None = None  # the visit whose follow-up advice booked this one
     # Pre-visit history (voicebot); red_flag marks urgent symptoms raised there
     history_session_id: PyObjectId | None = None
     history_status: str | None = None

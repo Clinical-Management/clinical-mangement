@@ -72,6 +72,8 @@ class Settings(BaseSettings):
     # Background sender for reminders and scheduled messages (off in tests, which call it directly)
     notifications_worker: bool = True
     notifications_interval_seconds: int = 30
+    # Serverless hosts (Vercel) turn the worker off and call /cron/notifications with this bearer secret
+    cron_secret: str | None = None
 
     # Report uploads (stored in MongoDB GridFS)
     report_max_mb: int = 25

@@ -1,4 +1,5 @@
 import asyncio
+import hmac
 import logging
 from contextlib import asynccontextmanager
 
@@ -74,6 +75,17 @@ async def engine_error_handler(_: Request, exc: EngineError):
 
 
 app.include_router(api_router, prefix=settings.api_prefix)
+
+
+@app.get("/cron/notifications", include_in_schema=False)
+async def cron_notifications(request: Request):
+    """One worker tick for hosts without a long-running process (Vercel Cron sends the bearer secret)."""
+    from app.services import reminder_service
+
+    if not settings.cron_secret or not hmac.compare_digest(request.headers.get("authorization", ""), f"Bearer {settings.cron_secret}"):
+        return JSONResponse(status_code=401, content={"detail": "unauthorized"})
+    await reminder_service.queue_due(mongo.db)
+    return {"sent": await notify_service.dispatch_due(mongo.db)}
 
 
 @app.get("/health", tags=["health"])

@@ -88,6 +88,11 @@ async def cron_notifications(request: Request):
     return {"sent": await notify_service.dispatch_due(mongo.db)}
 
 
+@app.get("/", include_in_schema=False)
+async def root():
+    return {"name": settings.app_name, "docs": "/docs", "health": "/health"}
+
+
 @app.get("/health", tags=["health"])
 async def health():
     return {"status": "ok"}

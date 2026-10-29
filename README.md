@@ -73,7 +73,7 @@ All demo accounts use `DemoPass123!`:
 | Role | Email | Name |
 | --- | --- | --- |
 | Admin | `admin@demo.clinic` | Demo Admin |
-| Doctor (General Medicine) | `doctor@demo.clinic` | Dr. Asha Rao |
+| Doctor (General Medicine) | `doctor@demo.clinic` | Dr. Asha Rao |I al
 | Doctor (Paediatrics) | `pediatrician@demo.clinic` | Dr. Vikram Iyer |
 | Receptionist | `receptionist@demo.clinic` | Neha Kulkarni |
 | Patient | `patient@demo.clinic` | Priya Deshmukh (manages her son Aarav and father Suresh) |
